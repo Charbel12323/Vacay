@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# production
+build/
+
+# env files (only .env.example is committed)
+.env
+.env.*
+!.env.example
+
+# misc
+*.pem
+.DS_Store
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# typescript
+*.tsbuildinfo
+
+# testing
+coverage/
+
+# editor
+.idea/
+.vscode/
