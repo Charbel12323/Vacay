@@ -1,5 +1,22 @@
 # Progress log
 
+## Stage 3 — Plaid connect flow (2026-07-07)
+
+**Built:**
+`modules/connections/plaid.ts` as the single Plaid SDK entry point (link token, public-token exchange, accounts fetch, institution lookup, item removal), enforced by an ESLint no-restricted-imports rule.
+`modules/connections/crypto.ts`: AES-256-GCM token encryption (`v1:iv:tag:ciphertext`), key derived from `TOKEN_ENC_KEY`, with round-trip, tamper, and fresh-IV tests.
+API: `POST /api/connections/link-token` (CA+US, transactions product, 730-day history request), `POST /api/connections` (exchange, encrypt, persist connection + accounts, 202 with the contracted response shape, Stage 4 TODO hook for the sync enqueue), `GET /api/connections`, `GET /api/connections/:id` (polling endpoint), `DELETE /api/connections/:id` (mark revoking, Plaid `/item/remove`, purge rows).
+Dashboard UI: react-plaid-link connect button, connections list with institution, account masks, and status labels, disconnect with confirmation.
+
+**Verified (real Plaid Sandbox, in-browser):**
+Full Link flow with RBC Royal Bank and user_good/pass_good: 12 accounts persisted and rendered with masks; `access_token_enc` in Postgres is a `v1:` envelope, not a Plaid token; cursor NULL and health pending as specified.
+Disconnect removed the Item at Plaid and purged connection + accounts rows.
+Server logs grepped clean of access tokens; live-DB tests cover encrypted-at-rest, summary serialization without token fields, cross-user NOT_FOUND, and malformed-id NOT_FOUND.
+
+**Deviations from the stage doc:**
+None material.
+Malformed connection ids return 404 rather than a DB cast error (consistent with the 404-not-403 rule).
+
 ## Stage 2 — Authentication & accounts (2026-07-06)
 
 **Built:**
