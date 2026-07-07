@@ -1,4 +1,5 @@
 import { auth, signOut } from "@/lib/auth";
+import { ConnectionsPanel } from "./connections-panel";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -19,9 +20,7 @@ export default async function DashboardPage() {
         </form>
       </header>
       <p>Signed in as {session?.user?.email}.</p>
-      <p style={{ color: "#666" }}>
-        Nothing here yet — connect a bank in an upcoming release to see your subscriptions.
-      </p>
+      <ConnectionsPanel />
     </main>
   );
 }

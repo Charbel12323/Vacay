@@ -14,6 +14,24 @@ const eslintConfig = [
   {
     ignores: [".next/**", "node_modules/**", "drizzle/meta/**", "next-env.d.ts"],
   },
+  {
+    // All Plaid calls go through modules/connections/plaid.ts (plan.md §2).
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/modules/connections/plaid.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "plaid",
+              message: "Import Plaid only via modules/connections/plaid.ts.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;
