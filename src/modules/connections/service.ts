@@ -1,9 +1,16 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { accounts, connections } from "@/db/schema";
+import { enqueueSync } from "@/lib/queues";
 import { ApiError } from "@/modules/api/errors";
 import { decryptToken, encryptToken } from "./crypto";
-import { exchangePublicToken, getAccounts, getInstitutionName, removeItem } from "./plaid";
+import {
+  createUpdateLinkToken,
+  exchangePublicToken,
+  getAccounts,
+  getInstitutionName,
+  removeItem,
+} from "./plaid";
 
 export type ConnectionSummary = {
   id: string;
@@ -57,8 +64,9 @@ export async function createConnection(
     );
   }
 
-  // TODO(stage-04): enqueue the initial sync job for this connection here,
-  // AFTER this function's writes are committed (plan.md invariant 2).
+  // Truth before announce (invariant 2): the connection + accounts writes
+  // above are committed before the sync job is enqueued.
+  await enqueueSync(connection!.id);
 
   return {
     id: connection!.id,
@@ -99,6 +107,28 @@ export async function removeConnection(userId: string, id: string): Promise<void
   await db.update(connections).set({ status: "revoking" }).where(eq(connections.id, row.id));
   await removeItem(decryptToken(row.accessTokenEnc));
   await db.delete(connections).where(eq(connections.id, row.id));
+}
+
+/** Link token in update mode for a connection that needs re-auth. */
+export async function createReauthToken(userId: string, id: string): Promise<string> {
+  const row = await findOwnedConnection(userId, id);
+  return createUpdateLinkToken(userId, decryptToken(row.accessTokenEnc));
+}
+
+/** After a successful Link update: flip health back and re-sync. */
+export async function completeReauth(userId: string, id: string): Promise<void> {
+  const row = await findOwnedConnection(userId, id);
+  await db
+    .update(connections)
+    .set({ status: "syncing", updatedAt: new Date() })
+    .where(eq(connections.id, row.id));
+  await enqueueSync(row.id);
+}
+
+/** Manual refresh: enqueue a sync (route applies the 1/min rate limit). */
+export async function requestRefresh(userId: string, id: string): Promise<void> {
+  const row = await findOwnedConnection(userId, id);
+  await enqueueSync(row.id);
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

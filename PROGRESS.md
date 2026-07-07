@@ -1,5 +1,29 @@
 # Progress log
 
+## Stage 4 — Ingestion pipeline (2026-07-07)
+
+**Built:**
+`modules/connections/sync.ts`: cursor-based `/transactions/sync` loop where each page's upserts, removals, and cursor advance commit in ONE `db.transaction` (invariant 1), with an injectable page fetcher for tests.
+Write-time normalization precursor (`normalizeMerchantBasic`) and transfer/refund flagging (`isTransfer`/`isRefund`/`isCountable`) in `modules/connections/normalize.ts`.
+Worker: real sync handler (work-before-acknowledge, detection enqueued only after commit), 5-attempt exponential backoff, failed jobs kept as a dead-letter set, final failure marks the connection `degraded`, `revoking` connections abort silently.
+`POST /api/webhooks/plaid`: ES256 JWT signature verified against Plaid's published key (fetched by kid, cached) and the body sha256 compared BEFORE the body is trusted; TRANSACTIONS webhooks enqueue a sync (deduped via jobId = connection id), ITEM error codes flip health to `reauth_required`.
+Re-auth flow: `POST /api/connections/:id/reauth` (update-mode link token), `PATCH` to complete; dashboard banner opens Link update mode.
+Manual refresh: `POST /api/connections/:id/refresh`, rate limited 1/min per connection.
+Stage 3's TODO wired: `POST /api/connections` now enqueues the initial sync; UI polls and shows "Analyzing your accounts…" while syncing.
+
+**Verified (live sandbox + tests):**
+Connect → 202 → worker backfill → status `ok`; 48 transactions persisted, 48 distinct plaid ids after repeated re-syncs (zero duplicates).
+Kill-mid-backfill test: crash after page 1 leaves page 1 + cursor committed together; restart resumes with no gaps and no duplicates.
+Structural test asserts the cursor is only ever advanced inside the same transaction that writes its page.
+Webhook signature tests with a real ES256 keypair (valid passes; wrong key, tampered body, bad alg, garbage all rejected); live endpoint returns 401 envelopes for missing/bad signatures.
+Five rapid enqueues for one connection collapse to exactly one queued job (live Redis).
+Refresh returns 202 then 429 within the window (live).
+Transfer/refund flagging verified in units and against live sandbox data (card payments, ACH, CD deposits flagged; Uber store codes normalized away).
+
+**Deviations / known gaps:**
+Plaid cannot deliver webhooks to a local machine, so end-to-end webhook delivery (sandbox `fire_webhook`) awaits a public URL — set `PLAID_WEBHOOK_URL` when deployed (Stage 9) or tunnel locally; the verification and handling logic is fully tested at the route seam.
+Sandbox's first `/transactions/sync` often returns zero rows until Plaid prepares the item; without webhooks locally, the manual refresh pulls the prepared data (this is sandbox-only behavior).
+
 ## Stage 3 — Plaid connect flow (2026-07-07)
 
 **Built:**

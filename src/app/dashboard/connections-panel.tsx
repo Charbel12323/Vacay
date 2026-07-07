@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 
 type Account = {
@@ -20,8 +20,8 @@ type Connection = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: "Connected — sync coming soon",
-  syncing: "Syncing…",
+  pending: "Preparing…",
+  syncing: "Analyzing your accounts…",
   ready: "Up to date",
   ok: "Up to date",
   reauth_required: "Needs re-authentication",
@@ -29,9 +29,12 @@ const STATUS_LABELS: Record<string, string> = {
   revoking: "Disconnecting…",
 };
 
+const IN_PROGRESS = new Set(["pending", "syncing", "revoking"]);
+
 export function ConnectionsPanel() {
   const [connections, setConnections] = useState<Connection[] | null>(null);
   const [linkToken, setLinkToken] = useState<string | null>(null);
+  const [reauthState, setReauthState] = useState<{ id: string; token: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -40,7 +43,9 @@ export function ConnectionsPanel() {
     if (res.ok) {
       const body = await res.json();
       setConnections(body.connections);
+      return body.connections as Connection[];
     }
+    return null;
   }, []);
 
   useEffect(() => {
@@ -55,6 +60,25 @@ export function ConnectionsPanel() {
       }
     })();
   }, [refresh]);
+
+  // Poll while any connection is mid-sync ("Analyzing your accounts…").
+  const anyInProgress = connections?.some((c) => IN_PROGRESS.has(c.status)) ?? false;
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (anyInProgress && !pollRef.current) {
+      pollRef.current = setInterval(() => void refresh(), 2500);
+    }
+    if (!anyInProgress && pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
+  }, [anyInProgress, refresh]);
 
   const onSuccess = useCallback(
     async (publicToken: string) => {
@@ -93,6 +117,35 @@ export function ConnectionsPanel() {
     await refresh();
   }
 
+  async function manualRefresh(connection: Connection) {
+    setError(null);
+    const res = await fetch(`/api/connections/${connection.id}/refresh`, { method: "POST" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      setError(body?.error?.message ?? "Refresh failed.");
+      return;
+    }
+    await refresh();
+  }
+
+  async function startReauth(connection: Connection) {
+    setError(null);
+    const res = await fetch(`/api/connections/${connection.id}/reauth`, { method: "POST" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      setError(body?.error?.message ?? "Could not start re-authentication.");
+      return;
+    }
+    const body = await res.json();
+    setReauthState({ id: connection.id, token: body.link_token });
+  }
+
+  async function onReauthSuccess(connectionId: string) {
+    setReauthState(null);
+    await fetch(`/api/connections/${connectionId}/reauth`, { method: "PATCH" });
+    await refresh();
+  }
+
   return (
     <section style={{ marginTop: "2rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -108,6 +161,14 @@ export function ConnectionsPanel() {
       </div>
 
       {error && <p style={{ color: "crimson" }}>{error}</p>}
+
+      {reauthState && (
+        <ReauthLink
+          token={reauthState.token}
+          onSuccess={() => void onReauthSuccess(reauthState.id)}
+          onExit={() => setReauthState(null)}
+        />
+      )}
 
       {connections === null ? (
         <p style={{ color: "#666" }}>Loading…</p>
@@ -135,6 +196,24 @@ export function ConnectionsPanel() {
                   {STATUS_LABELS[c.status] ?? c.status}
                 </span>
               </div>
+
+              {c.status === "reauth_required" && (
+                <div
+                  style={{
+                    background: "#fff4e5",
+                    border: "1px solid #f0c36d",
+                    borderRadius: 6,
+                    padding: "0.6rem",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  This bank needs you to sign in again to keep syncing.{" "}
+                  <button type="button" onClick={() => void startReauth(c)}>
+                    Reconnect
+                  </button>
+                </div>
+              )}
+
               <ul style={{ listStyle: "none", padding: 0, marginTop: "0.5rem", color: "#444" }}>
                 {c.accounts.map((a) => (
                   <li key={a.id}>
@@ -142,17 +221,44 @@ export function ConnectionsPanel() {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                onClick={() => void disconnect(c)}
-                style={{ marginTop: "0.5rem", padding: "0.3rem 0.7rem" }}
-              >
-                Disconnect
-              </button>
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+                <button
+                  type="button"
+                  onClick={() => void manualRefresh(c)}
+                  disabled={IN_PROGRESS.has(c.status)}
+                  style={{ padding: "0.3rem 0.7rem" }}
+                >
+                  Refresh
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void disconnect(c)}
+                  style={{ padding: "0.3rem 0.7rem" }}
+                >
+                  Disconnect
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       )}
     </section>
   );
+}
+
+/** Opens Plaid Link in update mode as soon as its token is ready. */
+function ReauthLink({
+  token,
+  onSuccess,
+  onExit,
+}: {
+  token: string;
+  onSuccess: () => void;
+  onExit: () => void;
+}) {
+  const { open, ready } = usePlaidLink({ token, onSuccess, onExit });
+  useEffect(() => {
+    if (ready) open();
+  }, [ready, open]);
+  return null;
 }
