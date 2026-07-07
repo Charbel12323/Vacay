@@ -9,6 +9,9 @@ const envSchema = z.object({
   TOKEN_ENC_KEY: z.string().min(32, "TOKEN_ENC_KEY must be at least 32 characters"),
   RESEND_API_KEY: z.string().min(1),
   AUTH_SECRET: z.string().min(1),
+  // Optional: Google sign-in is offered only when both are set.
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 

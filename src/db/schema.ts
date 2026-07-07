@@ -73,6 +73,8 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   name: text("name"),
+  // bcrypt hash; NULL for OAuth-only users.
+  passwordHash: text("password_hash"),
   authProviderId: text("auth_provider_id"),
   status: userStatusEnum("status").notNull().default("active"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

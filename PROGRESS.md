@@ -1,5 +1,27 @@
 # Progress log
 
+## Stage 2 — Authentication & accounts (2026-07-06)
+
+**Built:**
+Auth.js (next-auth v5) with a credentials provider (bcrypt password hashing, users created via `POST /api/auth/signup`) and Google OAuth (enabled only when `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` are set; users rows created and `auth_provider_id` linked on first Google sign-in).
+JWT sessions in httpOnly, sameSite=lax cookies (secure in production); nothing in localStorage.
+Edge middleware protecting all pages except `/`, `/login`, `/signup`, and all `/api/*` except `/api/health`, `/api/auth/*`, `/api/webhooks/*`; unauthenticated API calls get the standard `{ error: { code, message } }` envelope with 401.
+`modules/api` gained the typed error-code module (`UNAUTHENTICATED`, `NOT_FOUND`, `VALIDATION_FAILED`, `EMAIL_IN_USE`, `RATE_LIMITED`, `INTERNAL`), `withErrorHandling` wrapper, `requireUser()`, and `assertOwned()` implementing the 404-not-403 rule.
+Fixed-window per-IP Redis rate limit (10/min) on all auth POST endpoints.
+Pages: landing, sign in, sign up, and the authenticated dashboard shell with sign-out.
+New migration `0001_auth` adds `users.password_hash`.
+
+**Verified:**
+Browser flow: sign up lands on /dashboard, sign out redirects, /dashboard redirects to /login with callbackUrl, explicit login honors it.
+Unauthed protected API returns the 401 envelope; /api/health stays open.
+Rate limit returns 429 with the envelope after the burst limit (live curl + Redis test).
+Cross-user resource access returns NOT_FOUND (live-DB test with two users).
+Server logs grepped clean of passwords/tokens; a static test forbids console calls referencing credentials.
+
+**Deviations from the stage doc:**
+Google OAuth is conditionally enabled by env so local dev and CI work without Google credentials.
+The Playwright e2e suite arrives in Stage 6 per the stage index; Stage 2's sign-up/out flow was verified manually in a real browser.
+
 ## Stage 1 — Foundation (2026-07-06)
 
 **Built:**
