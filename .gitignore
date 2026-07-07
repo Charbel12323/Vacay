@@ -32,3 +32,6 @@ coverage/
 # editor
 .idea/
 .vscode/
+
+# test tooling artifacts
+.playwright-mcp/
