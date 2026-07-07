@@ -1,0 +1,1067 @@
+[
+  {
+    "name": "Netflix",
+    "aliases": ["netflix.com", "netflix com", "nflx"],
+    "category": "streaming",
+    "knownPlans": [
+      { "name": "Standard with ads", "amount": "7.99", "cadence": "monthly" },
+      { "name": "Standard", "amount": "18.99", "cadence": "monthly" },
+      { "name": "Premium", "amount": "23.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Disney+",
+    "aliases": ["disney plus", "disneyplus", "disney+ subscription"],
+    "category": "streaming",
+    "knownPlans": [
+      { "name": "Standard", "amount": "12.99", "cadence": "monthly" },
+      { "name": "Premium annual", "amount": "159.99", "cadence": "annual" }
+    ]
+  },
+  {
+    "name": "Crave",
+    "aliases": ["crave.ca", "bell media crave"],
+    "category": "streaming",
+    "knownPlans": [
+      { "name": "Standard", "amount": "12.99", "cadence": "monthly" },
+      { "name": "Premium", "amount": "22.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Amazon Prime",
+    "aliases": ["amazon prime member", "amzn prime", "amazon.ca prime", "prime member"],
+    "category": "retail_membership",
+    "knownPlans": [
+      { "name": "Monthly", "amount": "9.99", "cadence": "monthly" },
+      { "name": "Annual", "amount": "99.00", "cadence": "annual" }
+    ]
+  },
+  {
+    "name": "Prime Video",
+    "aliases": ["amazon video", "prime video channels", "amzn digital"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "YouTube Premium",
+    "aliases": ["youtube premium", "google youtube", "youtubepremium"],
+    "category": "streaming",
+    "knownPlans": [{ "name": "Individual", "amount": "13.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "Apple TV+",
+    "aliases": ["apple tv", "appletv"],
+    "category": "streaming",
+    "knownPlans": [{ "name": "Monthly", "amount": "12.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "Paramount+",
+    "aliases": ["paramount plus", "paramountplus.com"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  { "name": "Hayu", "aliases": ["hayu.com"], "category": "streaming", "knownPlans": [] },
+  { "name": "CBC Gem", "aliases": ["cbc gem premium"], "category": "streaming", "knownPlans": [] },
+  {
+    "name": "Sportsnet+",
+    "aliases": ["sportsnet now", "snnow", "rogers sportsnet"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  { "name": "TSN", "aliases": ["tsn direct", "tsn.ca"], "category": "streaming", "knownPlans": [] },
+  {
+    "name": "DAZN",
+    "aliases": ["dazn.com", "dazn limited"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "NBA League Pass",
+    "aliases": ["nba league pass", "nba digital"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "NFL Game Pass",
+    "aliases": ["nfl game pass"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "Twitch",
+    "aliases": ["twitch subscription", "twitchinteractive", "twitch.tv"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "Spotify",
+    "aliases": ["spotify.com", "spotify p", "spotify ab"],
+    "category": "music",
+    "knownPlans": [
+      { "name": "Individual", "amount": "11.99", "cadence": "monthly" },
+      { "name": "Duo", "amount": "15.99", "cadence": "monthly" },
+      { "name": "Family", "amount": "18.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Apple Music",
+    "aliases": ["apple music sub"],
+    "category": "music",
+    "knownPlans": [{ "name": "Individual", "amount": "11.99", "cadence": "monthly" }]
+  },
+  { "name": "Tidal", "aliases": ["tidal music"], "category": "music", "knownPlans": [] },
+  {
+    "name": "SiriusXM",
+    "aliases": ["sirius xm", "siriusxm canada"],
+    "category": "music",
+    "knownPlans": []
+  },
+  { "name": "SoundCloud", "aliases": ["soundcloud go"], "category": "music", "knownPlans": [] },
+  {
+    "name": "Audible",
+    "aliases": ["audible.ca", "audible adbl"],
+    "category": "education",
+    "knownPlans": [{ "name": "Premium Plus", "amount": "14.95", "cadence": "monthly" }]
+  },
+  {
+    "name": "Apple",
+    "aliases": ["apple.com/bill", "itunes.com/bill", "itunes.com", "apple services"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "iCloud+",
+    "aliases": ["icloud storage", "icloud"],
+    "category": "cloud_storage",
+    "knownPlans": [
+      { "name": "50GB", "amount": "1.29", "cadence": "monthly" },
+      { "name": "200GB", "amount": "3.99", "cadence": "monthly" },
+      { "name": "2TB", "amount": "12.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Google One",
+    "aliases": ["google one storage", "google storage"],
+    "category": "cloud_storage",
+    "knownPlans": [
+      { "name": "100GB", "amount": "2.79", "cadence": "monthly" },
+      { "name": "2TB", "amount": "13.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Google Workspace",
+    "aliases": ["google gsuite", "gsuite", "google workspace"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "Dropbox",
+    "aliases": ["dropbox.com", "dropbox plus"],
+    "category": "cloud_storage",
+    "knownPlans": [
+      { "name": "Plus", "amount": "15.99", "cadence": "monthly" },
+      { "name": "Plus annual", "amount": "155.88", "cadence": "annual" }
+    ]
+  },
+  {
+    "name": "Microsoft 365",
+    "aliases": ["microsoft 365", "msft office", "office 365", "microsoft*365"],
+    "category": "software",
+    "knownPlans": [
+      { "name": "Personal", "amount": "10.99", "cadence": "monthly" },
+      { "name": "Personal annual", "amount": "109.00", "cadence": "annual" },
+      { "name": "Family annual", "amount": "149.00", "cadence": "annual" }
+    ]
+  },
+  {
+    "name": "Microsoft OneDrive",
+    "aliases": ["onedrive storage"],
+    "category": "cloud_storage",
+    "knownPlans": []
+  },
+  {
+    "name": "Adobe",
+    "aliases": ["adobe creative cloud", "adobe systems", "adobe acropro"],
+    "category": "software",
+    "knownPlans": [
+      { "name": "Photography", "amount": "12.99", "cadence": "monthly" },
+      { "name": "All apps", "amount": "89.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Canva",
+    "aliases": ["canva pty", "canva pro"],
+    "category": "software",
+    "knownPlans": [
+      { "name": "Pro", "amount": "14.99", "cadence": "monthly" },
+      { "name": "Pro annual", "amount": "149.99", "cadence": "annual" }
+    ]
+  },
+  { "name": "Figma", "aliases": ["figma inc"], "category": "software", "knownPlans": [] },
+  {
+    "name": "Notion",
+    "aliases": ["notion labs", "notion.so"],
+    "category": "software",
+    "knownPlans": []
+  },
+  { "name": "Evernote", "aliases": ["evernote corp"], "category": "software", "knownPlans": [] },
+  { "name": "Todoist", "aliases": ["doist todoist"], "category": "software", "knownPlans": [] },
+  {
+    "name": "1Password",
+    "aliases": ["1password.com", "agilebits"],
+    "category": "security",
+    "knownPlans": [{ "name": "Individual annual", "amount": "47.88", "cadence": "annual" }]
+  },
+  { "name": "LastPass", "aliases": ["lastpass.com"], "category": "security", "knownPlans": [] },
+  { "name": "Dashlane", "aliases": ["dashlane inc"], "category": "security", "knownPlans": [] },
+  {
+    "name": "NordVPN",
+    "aliases": ["nord vpn", "nordsecurity", "nordvpn.com"],
+    "category": "security",
+    "knownPlans": []
+  },
+  {
+    "name": "ExpressVPN",
+    "aliases": ["express vpn", "expressvpn.com"],
+    "category": "security",
+    "knownPlans": [{ "name": "Annual", "amount": "129.99", "cadence": "annual" }]
+  },
+  { "name": "Surfshark", "aliases": ["surfshark vpn"], "category": "security", "knownPlans": [] },
+  {
+    "name": "Proton",
+    "aliases": ["proton ag", "protonmail", "proton vpn"],
+    "category": "security",
+    "knownPlans": []
+  },
+  {
+    "name": "Norton",
+    "aliases": ["norton lifelock", "norton security", "nortonlifelock"],
+    "category": "security",
+    "knownPlans": []
+  },
+  { "name": "McAfee", "aliases": ["mcafee.com"], "category": "security", "knownPlans": [] },
+  {
+    "name": "ChatGPT",
+    "aliases": ["openai chatgpt", "openai", "chatgpt subscription"],
+    "category": "software",
+    "knownPlans": [{ "name": "Plus", "amount": "20.00", "cadence": "monthly" }]
+  },
+  {
+    "name": "Claude",
+    "aliases": ["anthropic claude", "anthropic"],
+    "category": "software",
+    "knownPlans": [{ "name": "Pro", "amount": "20.00", "cadence": "monthly" }]
+  },
+  {
+    "name": "GitHub",
+    "aliases": ["github inc", "github.com"],
+    "category": "software",
+    "knownPlans": [{ "name": "Copilot", "amount": "10.00", "cadence": "monthly" }]
+  },
+  {
+    "name": "JetBrains",
+    "aliases": ["jetbrains americas"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "Zoom",
+    "aliases": ["zoom.us", "zoom video"],
+    "category": "software",
+    "knownPlans": []
+  },
+  { "name": "Slack", "aliases": ["slack technologies"], "category": "software", "knownPlans": [] },
+  {
+    "name": "LinkedIn",
+    "aliases": ["linkedin premium", "linkedinpre"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "Squarespace",
+    "aliases": ["squarespace inc"],
+    "category": "software",
+    "knownPlans": []
+  },
+  { "name": "Wix", "aliases": ["wix.com"], "category": "software", "knownPlans": [] },
+  { "name": "Shopify", "aliases": ["shopify inc"], "category": "software", "knownPlans": [] },
+  {
+    "name": "Mailchimp",
+    "aliases": ["mailchimp intuit"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "Grammarly",
+    "aliases": ["grammarly inc"],
+    "category": "software",
+    "knownPlans": [{ "name": "Premium annual", "amount": "144.00", "cadence": "annual" }]
+  },
+  {
+    "name": "Duolingo",
+    "aliases": ["duolingo super"],
+    "category": "education",
+    "knownPlans": [{ "name": "Super annual", "amount": "119.99", "cadence": "annual" }]
+  },
+  { "name": "Babbel", "aliases": ["babbel gmbh"], "category": "education", "knownPlans": [] },
+  {
+    "name": "Coursera",
+    "aliases": ["coursera plus", "coursera.org"],
+    "category": "education",
+    "knownPlans": [{ "name": "Plus annual", "amount": "399.00", "cadence": "annual" }]
+  },
+  { "name": "Udemy", "aliases": ["udemy.com"], "category": "education", "knownPlans": [] },
+  {
+    "name": "Skillshare",
+    "aliases": ["skillshare.com"],
+    "category": "education",
+    "knownPlans": [{ "name": "Annual", "amount": "167.88", "cadence": "annual" }]
+  },
+  {
+    "name": "MasterClass",
+    "aliases": ["masterclass.com"],
+    "category": "education",
+    "knownPlans": [{ "name": "Annual", "amount": "120.00", "cadence": "annual" }]
+  },
+  { "name": "Brilliant", "aliases": ["brilliant.org"], "category": "education", "knownPlans": [] },
+  { "name": "Chegg", "aliases": ["chegg study"], "category": "education", "knownPlans": [] },
+  {
+    "name": "Scribd",
+    "aliases": ["scribd inc", "everand"],
+    "category": "education",
+    "knownPlans": []
+  },
+  {
+    "name": "Medium",
+    "aliases": ["medium.com", "a medium corp"],
+    "category": "news",
+    "knownPlans": [{ "name": "Member", "amount": "5.00", "cadence": "monthly" }]
+  },
+  { "name": "Substack", "aliases": ["substack inc"], "category": "news", "knownPlans": [] },
+  {
+    "name": "Patreon",
+    "aliases": ["patreon membership", "patreon.com"],
+    "category": "news",
+    "knownPlans": []
+  },
+  {
+    "name": "The Globe and Mail",
+    "aliases": ["globe and mail", "globeandmail"],
+    "category": "news",
+    "knownPlans": []
+  },
+  {
+    "name": "Toronto Star",
+    "aliases": ["torstar", "thestar.com"],
+    "category": "news",
+    "knownPlans": []
+  },
+  {
+    "name": "National Post",
+    "aliases": ["postmedia national post"],
+    "category": "news",
+    "knownPlans": []
+  },
+  {
+    "name": "The New York Times",
+    "aliases": ["nyt", "nytimes", "ny times digital"],
+    "category": "news",
+    "knownPlans": [{ "name": "All access", "amount": "6.25", "cadence": "monthly" }]
+  },
+  {
+    "name": "The Washington Post",
+    "aliases": ["washpost", "washington post digital"],
+    "category": "news",
+    "knownPlans": []
+  },
+  {
+    "name": "The Economist",
+    "aliases": ["economist newspaper", "economist digital"],
+    "category": "news",
+    "knownPlans": []
+  },
+  {
+    "name": "The Athletic",
+    "aliases": ["theathletic", "the athletic media"],
+    "category": "news",
+    "knownPlans": [{ "name": "Annual", "amount": "95.88", "cadence": "annual" }]
+  },
+  {
+    "name": "Wall Street Journal",
+    "aliases": ["wsj", "dowjones wsj"],
+    "category": "news",
+    "knownPlans": []
+  },
+  { "name": "Apple News+", "aliases": ["apple news plus"], "category": "news", "knownPlans": [] },
+  {
+    "name": "GoodLife Fitness",
+    "aliases": ["goodlife clubs", "goodlife fitness centres"],
+    "category": "gym",
+    "knownPlans": [{ "name": "Premium biweekly", "amount": "32.99", "cadence": "biweekly" }]
+  },
+  {
+    "name": "Planet Fitness",
+    "aliases": ["planet fitness canada", "pf canada"],
+    "category": "gym",
+    "knownPlans": [
+      { "name": "Classic", "amount": "15.00", "cadence": "monthly" },
+      { "name": "Black card", "amount": "24.99", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Anytime Fitness",
+    "aliases": ["anytime fitness club"],
+    "category": "gym",
+    "knownPlans": []
+  },
+  {
+    "name": "Fit4Less",
+    "aliases": ["fit 4 less", "fit4less clubs"],
+    "category": "gym",
+    "knownPlans": []
+  },
+  { "name": "LA Fitness", "aliases": ["la fitness canada"], "category": "gym", "knownPlans": [] },
+  {
+    "name": "Orangetheory",
+    "aliases": ["orangetheory fitness", "otf studio"],
+    "category": "gym",
+    "knownPlans": []
+  },
+  { "name": "F45 Training", "aliases": ["f45 studio"], "category": "gym", "knownPlans": [] },
+  { "name": "ClassPass", "aliases": ["classpass.com"], "category": "gym", "knownPlans": [] },
+  {
+    "name": "Peloton",
+    "aliases": ["peloton interactive", "onepeloton"],
+    "category": "gym",
+    "knownPlans": [
+      { "name": "App+", "amount": "30.00", "cadence": "monthly" },
+      { "name": "All access", "amount": "55.00", "cadence": "monthly" }
+    ]
+  },
+  {
+    "name": "Strava",
+    "aliases": ["strava inc"],
+    "category": "gym",
+    "knownPlans": [{ "name": "Annual", "amount": "99.99", "cadence": "annual" }]
+  },
+  { "name": "Whoop", "aliases": ["whoop inc"], "category": "health", "knownPlans": [] },
+  {
+    "name": "Fitbit Premium",
+    "aliases": ["fitbit premium"],
+    "category": "health",
+    "knownPlans": []
+  },
+  {
+    "name": "MyFitnessPal",
+    "aliases": ["myfitnesspal premium"],
+    "category": "health",
+    "knownPlans": []
+  },
+  {
+    "name": "Calm",
+    "aliases": ["calm.com"],
+    "category": "health",
+    "knownPlans": [{ "name": "Annual", "amount": "89.99", "cadence": "annual" }]
+  },
+  {
+    "name": "Headspace",
+    "aliases": ["headspace inc"],
+    "category": "health",
+    "knownPlans": [{ "name": "Annual", "amount": "89.99", "cadence": "annual" }]
+  },
+  { "name": "BetterHelp", "aliases": ["betterhelp.com"], "category": "health", "knownPlans": [] },
+  { "name": "Noom", "aliases": ["noom inc"], "category": "health", "knownPlans": [] },
+  {
+    "name": "WeightWatchers",
+    "aliases": ["ww international", "weight watchers"],
+    "category": "health",
+    "knownPlans": []
+  },
+  {
+    "name": "Rogers",
+    "aliases": ["rogers communications", "rogers wireless", "rogers cable"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Bell",
+    "aliases": ["bell canada", "bell mobility", "bell mts"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Telus",
+    "aliases": ["telus communications", "telus mobility"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Fido",
+    "aliases": ["fido solutions", "fido mobile"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  { "name": "Koodo", "aliases": ["koodo mobile"], "category": "telecom", "knownPlans": [] },
+  {
+    "name": "Virgin Plus",
+    "aliases": ["virgin mobile", "virgin plus canada"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Freedom Mobile",
+    "aliases": ["freedom mobile inc"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Public Mobile",
+    "aliases": ["public mobile inc"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  { "name": "Chatr", "aliases": ["chatr mobile"], "category": "telecom", "knownPlans": [] },
+  {
+    "name": "Shaw",
+    "aliases": ["shaw communications", "shaw cable"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  { "name": "Cogeco", "aliases": ["cogeco connexion"], "category": "telecom", "knownPlans": [] },
+  { "name": "Videotron", "aliases": ["videotron ltee"], "category": "telecom", "knownPlans": [] },
+  { "name": "Eastlink", "aliases": ["eastlink inc"], "category": "telecom", "knownPlans": [] },
+  { "name": "SaskTel", "aliases": ["sasktel mobility"], "category": "telecom", "knownPlans": [] },
+  {
+    "name": "TekSavvy",
+    "aliases": ["teksavvy solutions"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  { "name": "Oxio", "aliases": ["oxio internet"], "category": "telecom", "knownPlans": [] },
+  {
+    "name": "Start.ca",
+    "aliases": ["start communications"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Distributel",
+    "aliases": ["distributel communications"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "Hydro One",
+    "aliases": ["hydro one networks"],
+    "category": "utility",
+    "knownPlans": []
+  },
+  {
+    "name": "Toronto Hydro",
+    "aliases": ["toronto hydro electric"],
+    "category": "utility",
+    "knownPlans": []
+  },
+  {
+    "name": "BC Hydro",
+    "aliases": ["bc hydro and power"],
+    "category": "utility",
+    "knownPlans": []
+  },
+  { "name": "Hydro-Québec", "aliases": ["hydro quebec"], "category": "utility", "knownPlans": [] },
+  { "name": "ENMAX", "aliases": ["enmax energy"], "category": "utility", "knownPlans": [] },
+  { "name": "EPCOR", "aliases": ["epcor utilities"], "category": "utility", "knownPlans": [] },
+  { "name": "FortisBC", "aliases": ["fortis bc energy"], "category": "utility", "knownPlans": [] },
+  {
+    "name": "Enbridge Gas",
+    "aliases": ["enbridge gas inc"],
+    "category": "utility",
+    "knownPlans": []
+  },
+  {
+    "name": "Manitoba Hydro",
+    "aliases": ["manitoba hydro electric"],
+    "category": "utility",
+    "knownPlans": []
+  },
+  { "name": "Nova Scotia Power", "aliases": ["ns power"], "category": "utility", "knownPlans": [] },
+  {
+    "name": "Reliance Home Comfort",
+    "aliases": ["reliance comfort"],
+    "category": "utility",
+    "knownPlans": []
+  },
+  {
+    "name": "Intact Insurance",
+    "aliases": ["intact financial"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  {
+    "name": "Desjardins Insurance",
+    "aliases": ["desjardins assurances"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  {
+    "name": "TD Insurance",
+    "aliases": ["td meloche monnex"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  { "name": "Aviva", "aliases": ["aviva canada"], "category": "insurance", "knownPlans": [] },
+  {
+    "name": "Wawanesa",
+    "aliases": ["wawanesa insurance"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  { "name": "Sonnet", "aliases": ["sonnet insurance"], "category": "insurance", "knownPlans": [] },
+  {
+    "name": "Manulife",
+    "aliases": ["manulife financial"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  {
+    "name": "Sun Life",
+    "aliases": ["sun life financial"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  {
+    "name": "Canada Life",
+    "aliases": ["canada life assurance"],
+    "category": "insurance",
+    "knownPlans": []
+  },
+  {
+    "name": "PlayStation",
+    "aliases": ["playstation network", "sony playstation", "psn"],
+    "category": "gaming",
+    "knownPlans": [
+      { "name": "Plus Essential", "amount": "11.99", "cadence": "monthly" },
+      { "name": "Plus Essential annual", "amount": "94.99", "cadence": "annual" }
+    ]
+  },
+  {
+    "name": "Xbox",
+    "aliases": ["xbox game pass", "microsoft xbox", "msft xbox"],
+    "category": "gaming",
+    "knownPlans": [{ "name": "Game Pass Ultimate", "amount": "18.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "Nintendo",
+    "aliases": ["nintendo switch online", "nintendo of america"],
+    "category": "gaming",
+    "knownPlans": [{ "name": "Switch Online annual", "amount": "24.99", "cadence": "annual" }]
+  },
+  {
+    "name": "Steam",
+    "aliases": ["steamgames", "valve steam"],
+    "category": "gaming",
+    "knownPlans": []
+  },
+  {
+    "name": "EA Play",
+    "aliases": ["ea *play", "electronic arts"],
+    "category": "gaming",
+    "knownPlans": []
+  },
+  { "name": "Ubisoft+", "aliases": ["ubisoft plus"], "category": "gaming", "knownPlans": [] },
+  {
+    "name": "Discord",
+    "aliases": ["discord nitro"],
+    "category": "gaming",
+    "knownPlans": [{ "name": "Nitro", "amount": "13.99", "cadence": "monthly" }]
+  },
+  { "name": "Roblox", "aliases": ["roblox premium"], "category": "gaming", "knownPlans": [] },
+  {
+    "name": "World of Warcraft",
+    "aliases": ["blizzard entertainment", "battle.net"],
+    "category": "gaming",
+    "knownPlans": []
+  },
+  {
+    "name": "Uber One",
+    "aliases": ["uber one membership", "uber* one"],
+    "category": "food_delivery_membership",
+    "knownPlans": [{ "name": "Monthly", "amount": "9.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "DashPass",
+    "aliases": ["doordash dashpass", "doordash*dashpass"],
+    "category": "food_delivery_membership",
+    "knownPlans": [{ "name": "Monthly", "amount": "9.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "SkipTheDishes Plus",
+    "aliases": ["skip plus", "skipthedishes plus"],
+    "category": "food_delivery_membership",
+    "knownPlans": []
+  },
+  {
+    "name": "Instacart+",
+    "aliases": ["instacart plus", "instacart membership"],
+    "category": "food_delivery_membership",
+    "knownPlans": [{ "name": "Annual", "amount": "99.00", "cadence": "annual" }]
+  },
+  {
+    "name": "HelloFresh",
+    "aliases": ["hellofresh canada"],
+    "category": "meal_kit",
+    "knownPlans": []
+  },
+  { "name": "Goodfood", "aliases": ["goodfood market"], "category": "meal_kit", "knownPlans": [] },
+  { "name": "Chefs Plate", "aliases": ["chefsplate"], "category": "meal_kit", "knownPlans": [] },
+  {
+    "name": "Factor",
+    "aliases": ["factor meals", "factor75"],
+    "category": "meal_kit",
+    "knownPlans": []
+  },
+  {
+    "name": "Tinder",
+    "aliases": ["tinder gold", "mtch tinder"],
+    "category": "dating",
+    "knownPlans": []
+  },
+  {
+    "name": "Bumble",
+    "aliases": ["bumble premium", "bumble holding"],
+    "category": "dating",
+    "knownPlans": []
+  },
+  {
+    "name": "Hinge",
+    "aliases": ["hinge premium", "mtch hinge"],
+    "category": "dating",
+    "knownPlans": []
+  },
+  { "name": "Match.com", "aliases": ["match group"], "category": "dating", "knownPlans": [] },
+  { "name": "eharmony", "aliases": ["eharmony.ca"], "category": "dating", "knownPlans": [] },
+  {
+    "name": "Costco",
+    "aliases": ["costco membership", "costco annual"],
+    "category": "retail_membership",
+    "knownPlans": [
+      { "name": "Gold Star", "amount": "65.00", "cadence": "annual" },
+      { "name": "Executive", "amount": "130.00", "cadence": "annual" }
+    ]
+  },
+  {
+    "name": "Walmart+",
+    "aliases": ["walmart plus"],
+    "category": "retail_membership",
+    "knownPlans": []
+  },
+  {
+    "name": "PC Optimum Insiders",
+    "aliases": ["pc insiders", "pc optimum insider"],
+    "category": "retail_membership",
+    "knownPlans": [{ "name": "Annual", "amount": "119.00", "cadence": "annual" }]
+  },
+  {
+    "name": "SAQ Inspire",
+    "aliases": ["saq abonnement"],
+    "category": "retail_membership",
+    "knownPlans": []
+  },
+  {
+    "name": "CAA",
+    "aliases": ["caa membership", "caa club group"],
+    "category": "transport",
+    "knownPlans": [{ "name": "Classic annual", "amount": "79.00", "cadence": "annual" }]
+  },
+  {
+    "name": "Presto",
+    "aliases": ["presto autoload", "metrolinx presto"],
+    "category": "transport",
+    "knownPlans": []
+  },
+  {
+    "name": "Bike Share Toronto",
+    "aliases": ["bike share membership"],
+    "category": "transport",
+    "knownPlans": []
+  },
+  {
+    "name": "Communauto",
+    "aliases": ["communauto inc"],
+    "category": "transport",
+    "knownPlans": []
+  },
+  {
+    "name": "Evo Car Share",
+    "aliases": ["evo carshare"],
+    "category": "transport",
+    "knownPlans": []
+  },
+  { "name": "Turo", "aliases": ["turo inc"], "category": "transport", "knownPlans": [] },
+  { "name": "Netflix Games", "aliases": ["netflix games"], "category": "gaming", "knownPlans": [] },
+  {
+    "name": "Wealthsimple",
+    "aliases": ["wealthsimple inc", "wealthsimple premium"],
+    "category": "finance",
+    "knownPlans": []
+  },
+  { "name": "Questrade", "aliases": ["questrade inc"], "category": "finance", "knownPlans": [] },
+  { "name": "Borrowell", "aliases": ["borrowell inc"], "category": "finance", "knownPlans": [] },
+  { "name": "Credit Karma", "aliases": ["creditkarma"], "category": "finance", "knownPlans": [] },
+  {
+    "name": "QuickBooks",
+    "aliases": ["intuit quickbooks", "qbooks online"],
+    "category": "finance",
+    "knownPlans": []
+  },
+  { "name": "TurboTax", "aliases": ["intuit turbotax"], "category": "finance", "knownPlans": [] },
+  { "name": "Wave", "aliases": ["wave financial"], "category": "finance", "knownPlans": [] },
+  {
+    "name": "YNAB",
+    "aliases": ["you need a budget", "ynab.com"],
+    "category": "finance",
+    "knownPlans": [{ "name": "Annual", "amount": "109.00", "cadence": "annual" }]
+  },
+  {
+    "name": "Mint Mobile",
+    "aliases": ["mint mobile llc"],
+    "category": "telecom",
+    "knownPlans": []
+  },
+  {
+    "name": "PetSmart Autoship",
+    "aliases": ["petsmart auto ship"],
+    "category": "pet",
+    "knownPlans": []
+  },
+  {
+    "name": "Chewy Autoship",
+    "aliases": ["chewy auto ship", "chewy.com"],
+    "category": "pet",
+    "knownPlans": []
+  },
+  { "name": "BarkBox", "aliases": ["barkbox inc"], "category": "pet", "knownPlans": [] },
+  { "name": "KitNipBox", "aliases": ["kitnipbox llc"], "category": "pet", "knownPlans": [] },
+  {
+    "name": "Dollar Shave Club",
+    "aliases": ["dollarshaveclub"],
+    "category": "beauty",
+    "knownPlans": []
+  },
+  {
+    "name": "Harry's",
+    "aliases": ["harrys razor", "harrys.com"],
+    "category": "beauty",
+    "knownPlans": []
+  },
+  { "name": "Birchbox", "aliases": ["birchbox inc"], "category": "beauty", "knownPlans": [] },
+  { "name": "Ipsy", "aliases": ["ipsy glam bag"], "category": "beauty", "knownPlans": [] },
+  {
+    "name": "Sephora Beauty Insider",
+    "aliases": ["sephora subscription"],
+    "category": "beauty",
+    "knownPlans": []
+  },
+  { "name": "FabFitFun", "aliases": ["fabfitfun box"], "category": "beauty", "knownPlans": [] },
+  {
+    "name": "Book of the Month",
+    "aliases": ["bookofthemonth"],
+    "category": "education",
+    "knownPlans": []
+  },
+  {
+    "name": "Kindle Unlimited",
+    "aliases": ["kindle unltd", "amazon kindle unlimited"],
+    "category": "education",
+    "knownPlans": [{ "name": "Monthly", "amount": "9.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "Kobo Plus",
+    "aliases": ["rakuten kobo plus"],
+    "category": "education",
+    "knownPlans": []
+  },
+  { "name": "Nespresso", "aliases": ["nespresso club"], "category": "meal_kit", "knownPlans": [] },
+  {
+    "name": "Trade Coffee",
+    "aliases": ["trade coffee co"],
+    "category": "meal_kit",
+    "knownPlans": []
+  },
+  {
+    "name": "Ancestry",
+    "aliases": ["ancestry.ca", "ancestry.com"],
+    "category": "education",
+    "knownPlans": []
+  },
+  { "name": "23andMe", "aliases": ["23andme inc"], "category": "health", "knownPlans": [] },
+  {
+    "name": "Ring",
+    "aliases": ["ring protect", "amazon ring"],
+    "category": "security",
+    "knownPlans": [{ "name": "Protect Basic annual", "amount": "49.99", "cadence": "annual" }]
+  },
+  {
+    "name": "Nest Aware",
+    "aliases": ["google nest aware"],
+    "category": "security",
+    "knownPlans": []
+  },
+  {
+    "name": "SimpliSafe",
+    "aliases": ["simplisafe monitoring"],
+    "category": "security",
+    "knownPlans": []
+  },
+  { "name": "ADT", "aliases": ["adt security services"], "category": "security", "knownPlans": [] },
+  {
+    "name": "Telus SmartHome",
+    "aliases": ["telus smarthome security"],
+    "category": "security",
+    "knownPlans": []
+  },
+  { "name": "OnStar", "aliases": ["onstar llc"], "category": "transport", "knownPlans": [] },
+  {
+    "name": "Tesla",
+    "aliases": ["tesla premium connectivity"],
+    "category": "transport",
+    "knownPlans": [{ "name": "Premium Connectivity", "amount": "9.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "Canadian Tire Triangle Select",
+    "aliases": ["triangle select"],
+    "category": "retail_membership",
+    "knownPlans": []
+  },
+  {
+    "name": "Indigo Plum PLUS",
+    "aliases": ["plum plus", "indigo plum"],
+    "category": "retail_membership",
+    "knownPlans": [{ "name": "Annual", "amount": "39.00", "cadence": "annual" }]
+  },
+  {
+    "name": "Aeroplan",
+    "aliases": ["air canada aeroplan"],
+    "category": "transport",
+    "knownPlans": []
+  },
+  { "name": "Dropbox Sign", "aliases": ["hellosign"], "category": "software", "knownPlans": [] },
+  { "name": "DocuSign", "aliases": ["docusign inc"], "category": "software", "knownPlans": [] },
+  { "name": "Vimeo", "aliases": ["vimeo.com"], "category": "software", "knownPlans": [] },
+  {
+    "name": "Curiosity Stream",
+    "aliases": ["curiositystream"],
+    "category": "streaming",
+    "knownPlans": [{ "name": "Annual", "amount": "39.99", "cadence": "annual" }]
+  },
+  { "name": "Mubi", "aliases": ["mubi.com"], "category": "streaming", "knownPlans": [] },
+  {
+    "name": "Criterion Channel",
+    "aliases": ["criterion collection channel"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  { "name": "Shudder", "aliases": ["shudder amc"], "category": "streaming", "knownPlans": [] },
+  { "name": "BritBox", "aliases": ["britbox intl"], "category": "streaming", "knownPlans": [] },
+  { "name": "Acorn TV", "aliases": ["acorn.tv"], "category": "streaming", "knownPlans": [] },
+  { "name": "VRV", "aliases": ["vrv.co"], "category": "streaming", "knownPlans": [] },
+  {
+    "name": "Crunchyroll",
+    "aliases": ["crunchyroll llc"],
+    "category": "streaming",
+    "knownPlans": [{ "name": "Fan", "amount": "9.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "Funimation",
+    "aliases": ["funimation productions"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "The Criterion Collection",
+    "aliases": ["criterion.com"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "OnlyFans",
+    "aliases": ["onlyfans.com", "fenix international"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  {
+    "name": "Cineplex",
+    "aliases": ["cineclub", "cineplex club"],
+    "category": "streaming",
+    "knownPlans": [{ "name": "CineClub", "amount": "9.99", "cadence": "monthly" }]
+  },
+  {
+    "name": "AMC Stubs A-List",
+    "aliases": ["amc stubs"],
+    "category": "streaming",
+    "knownPlans": []
+  },
+  { "name": "Fabletics", "aliases": ["fabletics vip"], "category": "beauty", "knownPlans": [] },
+  {
+    "name": "Savage X Fenty",
+    "aliases": ["savage x membership"],
+    "category": "beauty",
+    "knownPlans": []
+  },
+  { "name": "Adore Me", "aliases": ["adoreme vip"], "category": "beauty", "knownPlans": [] },
+  { "name": "Stitch Fix", "aliases": ["stitchfix"], "category": "beauty", "knownPlans": [] },
+  {
+    "name": "Rent the Runway",
+    "aliases": ["renttherunway"],
+    "category": "beauty",
+    "knownPlans": []
+  },
+  {
+    "name": "Freshbooks",
+    "aliases": ["freshbooks cloud accounting"],
+    "category": "finance",
+    "knownPlans": []
+  },
+  {
+    "name": "Backblaze",
+    "aliases": ["backblaze.com"],
+    "category": "cloud_storage",
+    "knownPlans": [{ "name": "Computer backup annual", "amount": "99.00", "cadence": "annual" }]
+  },
+  { "name": "pCloud", "aliases": ["pcloud ag"], "category": "cloud_storage", "knownPlans": [] },
+  {
+    "name": "Sync.com",
+    "aliases": ["sync.com inc"],
+    "category": "cloud_storage",
+    "knownPlans": []
+  },
+  {
+    "name": "GoDaddy",
+    "aliases": ["godaddy.com", "godaddy domains"],
+    "category": "software",
+    "knownPlans": []
+  },
+  { "name": "Namecheap", "aliases": ["namecheap.com"], "category": "software", "knownPlans": [] },
+  { "name": "Cloudflare", "aliases": ["cloudflare inc"], "category": "software", "knownPlans": [] },
+  {
+    "name": "DigitalOcean",
+    "aliases": ["digitalocean.com"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "AWS",
+    "aliases": ["amazon web services", "aws emea"],
+    "category": "software",
+    "knownPlans": []
+  },
+  {
+    "name": "Google Cloud",
+    "aliases": ["google cloud platform", "gcp billing"],
+    "category": "software",
+    "knownPlans": []
+  },
+  { "name": "Heroku", "aliases": ["heroku.com"], "category": "software", "knownPlans": [] },
+  { "name": "Vercel", "aliases": ["vercel inc"], "category": "software", "knownPlans": [] },
+  { "name": "Railway", "aliases": ["railway corp"], "category": "software", "knownPlans": [] }
+]

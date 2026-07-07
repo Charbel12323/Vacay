@@ -137,6 +137,9 @@ export const subscriptions = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    // Engine stream identity (accountId:merchant:cluster) — the diff key for
+    // idempotent detection upserts.
+    streamKey: text("stream_key").notNull(),
     accountId: uuid("account_id")
       .notNull()
       .references(() => accounts.id, { onDelete: "cascade" }),
@@ -157,7 +160,10 @@ export const subscriptions = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("subscriptions_user_id_idx").on(table.userId)],
+  (table) => [
+    index("subscriptions_user_id_idx").on(table.userId),
+    unique("subscriptions_user_stream_key_uq").on(table.userId, table.streamKey),
+  ],
 );
 
 export const transactions = pgTable(

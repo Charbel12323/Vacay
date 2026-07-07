@@ -1,0 +1,26 @@
+{
+  "name": "weekly coffee is a habit, not a subscription",
+  "today": "2026-07-01",
+  "merchants": [],
+  "transactions": [
+    { "id": "t1", "date": "2026-05-04", "amount": "5.25", "descriptor": "LATTE HOUSE TORONTO" },
+    { "id": "t2", "date": "2026-05-11", "amount": "5.50", "descriptor": "LATTE HOUSE TORONTO" },
+    { "id": "t3", "date": "2026-05-18", "amount": "5.25", "descriptor": "LATTE HOUSE TORONTO" },
+    { "id": "t4", "date": "2026-05-25", "amount": "4.95", "descriptor": "LATTE HOUSE TORONTO" },
+    { "id": "t5", "date": "2026-06-01", "amount": "5.25", "descriptor": "LATTE HOUSE TORONTO" },
+    { "id": "t6", "date": "2026-06-08", "amount": "5.75", "descriptor": "LATTE HOUSE TORONTO" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "latte house toronto",
+        "cadence": "weekly",
+        "classification": "habit",
+        "verdict": null,
+        "maxConfidence": 0.79
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": []
+  }
+}

@@ -2,27 +2,14 @@
  * Write-time normalization and flagging for ingested transactions.
  * Pure functions — unit tested, no I/O.
  *
- * normalizeMerchantBasic is the Stage 5 normalizer's precursor (simple
- * noise-strip only; alias matching arrives with the detection engine).
+ * The noise-strip is the detection engine's canonical one (engine/ is pure,
+ * so this import direction is safe) — ingestion and detection always agree.
+ * Alias matching against the merchant table happens at detection time.
  */
-
-const PROCESSOR_PREFIXES = /^(sq \*|paypal \*|pp\* ?|apl\* ?|tst\* ?|py \*|sp \* ?)/i;
+import { stripDescriptorNoise } from "@/modules/detection/engine/normalize";
 
 export function normalizeMerchantBasic(rawDescriptor: string): string {
-  let s = rawDescriptor.toLowerCase();
-  s = s.replace(PROCESSOR_PREFIXES, "");
-  // Phone numbers (800-555-0100, 4165550100, +1 416 555 0100).
-  s = s.replace(/\+?1?[\s-.]?\(?\d{3}\)?[\s-.]?\d{3}[\s-.]?\d{4}/g, " ");
-  // Store/reference numbers: "#1234", "store 0042", long digit runs.
-  s = s.replace(/#\s?\d+/g, " ");
-  s = s.replace(/\bstore\s?\d+\b/g, " ");
-  s = s.replace(/\b\d{4,}\b/g, " ");
-  // Trailing Canadian province / US state codes and common city noise.
-  s = s.replace(/\s+(ab|bc|mb|nb|nl|ns|nt|nu|on|pe|qc|sk|yt|ca|ny|wa|tx|fl|il)\s*$/i, " ");
-  // Punctuation noise, collapse whitespace.
-  s = s.replace(/[*_|]/g, " ");
-  s = s.replace(/\s{2,}/g, " ").trim();
-  return s;
+  return stripDescriptorNoise(rawDescriptor);
 }
 
 export type FlagInput = {

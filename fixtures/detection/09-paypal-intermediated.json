@@ -1,0 +1,58 @@
+{
+  "name": "PayPal-intermediated subscription resolves to the real merchant",
+  "today": "2026-07-01",
+  "merchants": [
+    {
+      "id": "m-netflix",
+      "name": "Netflix",
+      "aliases": ["netflix.com"],
+      "category": "streaming",
+      "knownPlans": []
+    }
+  ],
+  "transactions": [
+    {
+      "id": "t1",
+      "date": "2026-02-03",
+      "amount": "16.99",
+      "descriptor": "PAYPAL *NETFLIX.COM 4029357733 CA"
+    },
+    {
+      "id": "t2",
+      "date": "2026-03-03",
+      "amount": "16.99",
+      "descriptor": "PAYPAL *NETFLIX.COM 4029357733 CA"
+    },
+    {
+      "id": "t3",
+      "date": "2026-04-03",
+      "amount": "16.99",
+      "descriptor": "PAYPAL *NETFLIX.COM 4029357733 CA"
+    },
+    {
+      "id": "t4",
+      "date": "2026-05-03",
+      "amount": "16.99",
+      "descriptor": "PAYPAL *NETFLIX.COM 4029357733 CA"
+    },
+    {
+      "id": "t5",
+      "date": "2026-06-03",
+      "amount": "16.99",
+      "descriptor": "PAYPAL *NETFLIX.COM 4029357733 CA"
+    }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "netflix",
+        "merchantName": "Netflix",
+        "cadence": "monthly",
+        "classification": "subscription",
+        "minConfidence": 0.8
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": ["new_probable_subscription"]
+  }
+}

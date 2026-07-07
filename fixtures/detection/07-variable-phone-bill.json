@@ -1,0 +1,34 @@
+{
+  "name": "variable phone bill is a bill, not a subscription",
+  "today": "2026-07-01",
+  "merchants": [
+    {
+      "id": "m-rogers",
+      "name": "Rogers",
+      "aliases": ["rogers communications", "rogers wireless"],
+      "category": "telecom",
+      "knownPlans": []
+    }
+  ],
+  "transactions": [
+    { "id": "t1", "date": "2026-01-20", "amount": "61.20", "descriptor": "ROGERS WIRELESS" },
+    { "id": "t2", "date": "2026-02-20", "amount": "63.50", "descriptor": "ROGERS WIRELESS" },
+    { "id": "t3", "date": "2026-03-20", "amount": "60.80", "descriptor": "ROGERS WIRELESS" },
+    { "id": "t4", "date": "2026-04-20", "amount": "62.10", "descriptor": "ROGERS WIRELESS" },
+    { "id": "t5", "date": "2026-05-20", "amount": "61.90", "descriptor": "ROGERS WIRELESS" },
+    { "id": "t6", "date": "2026-06-20", "amount": "64.05", "descriptor": "ROGERS WIRELESS" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "rogers",
+        "cadence": "monthly",
+        "classification": "bill",
+        "verdict": null,
+        "maxConfidence": 0.79
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": []
+  }
+}
