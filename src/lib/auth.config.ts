@@ -9,6 +9,9 @@ import type { NextAuthConfig } from "next-auth";
  * production. Tokens never go to localStorage.
  */
 export const authConfig = {
+  // Required outside Vercel (Railway, local `next start`): trust the Host
+  // header the platform sets. Without it v5 rejects auth requests entirely.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },

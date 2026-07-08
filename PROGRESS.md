@@ -1,5 +1,28 @@
 # Progress log
 
+## Stage 6 — Dashboard & product APIs (2026-07-08)
+
+**Built:**
+Read APIs, all precomputed from Postgres (invariant 6): `GET /api/subscriptions/summary` (string amounts, cadences normalized to monthly equivalents, flag counts, estimated waste, `as_of`), `GET /api/subscriptions` (cursor-paginated list with verdict/confidence/account mask), `GET /api/subscriptions/:id` (detail + price history + evidence transactions with raw descriptors), and `GET /api/transactions` (raw feed for evidence views).
+`PATCH /api/subscriptions/:id` with a strict whitelist (`{user_confirmed}` or `{status:"dismissed"}`, anything else 422): persists feedback, on reject unlinks transactions, records the negative merchant signal, and enqueues incremental detection; responds only after commit (invariant 8).
+Dashboard UI: three metric cards, "updated X min ago", subscription list grouped by verdict severity, low-confidence question cards with Yes/No, detail drawer with price history and raw-descriptor evidence, "Not a subscription"/"Dismiss" actions with optimistic update + revert-and-toast on error, honest empty states.
+Money rendering goes through a single integer-cents `formatMoney`/summary utility; no float math in the frontend.
+Playwright e2e suite (`e2e/`, `npm run test:e2e`): signup → sandbox connect (Plaid custom user with deterministic Netflix/Spotify history) → wait ready → verdict rows appear (never as question cards) → evidence drawer → reject one → gone, and still gone after refresh.
+
+**Verified:**
+Summary math unit tests: mixed cadences normalize to a correct monthly total; dismissed/cancelled streams, bills, habits, and sub-0.80 questions are excluded.
+UI invariant 5 test: no stream under 0.80 confidence ever renders in a verdict section, whatever its verdict field says; copy tests keep verdict lines calm and evidence-first.
+Live-DB API test: summary/list/detail contracts, the PATCH whitelist (422 envelope), read-your-own-writes on reject, and cross-user 404.
+Benchmark against the seeded 50k-transaction user (`scripts/benchmark.ts`): summary p95 10.5ms, list p95 9.0ms, transactions p95 7.2ms — far under the 500ms budget.
+Full e2e passes against the real stack (web + worker + Postgres + Redis + Plaid sandbox).
+
+**Deviations / notes:**
+Fixed a Stage 4 gap the e2e exposed: `/transactions/sync` drains to `has_more:false` with near-empty pages while Plaid is still preparing an item's historical pull, so the initial sync could complete and flip a connection `ready` with almost no data.
+The sync loop now surfaces `transactions_update_status` and throws (for queue backoff retry) until the historical pull is complete; committed pages and the cursor stay safe, and the connection honestly stays `syncing`.
+The e2e creates connections via `/sandbox/public_token/create` (Link's iframe is not scriptable), posting the public token through the app's own `/api/connections` exactly like Link's `onSuccess`.
+Plaid sandbox serves roughly the most recent 90 days of a custom user's configured history regardless of the requested range, so the e2e asserts on at least 3 monthly charges per stream.
+`trustHost: true` added to the Auth.js config — required for `next start` outside Vercel; without it v5 rejects every auth request.
+
 ## Stage 5 — Detection engine (2026-07-07)
 
 **Built:**

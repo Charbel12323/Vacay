@@ -215,6 +215,51 @@ describe.skipIf(!hasDb)("sync engine (live DB, mocked Plaid)", () => {
     await cleanup(userId);
   });
 
+  it("does not report completion while Plaid's historical pull is unready", async () => {
+    const { syncConnection } = await import("@/modules/connections/sync");
+    const { eq } = await import("drizzle-orm");
+    const { db } = await import("@/db/client");
+    const { connections } = await import("@/db/schema");
+    const { userId, connectionId } = await setupConnection(`sync-f-${Date.now()}`);
+
+    // Plaid's initial-pull window: cursor drains with a near-empty page but
+    // transactions_update_status says the history isn't prepared yet.
+    const notReady = async (): Promise<SyncPage> => ({
+      added: [makeTxn("h1", 18.99)],
+      modified: [],
+      removed: [],
+      nextCursor: "h-cursor",
+      hasMore: false,
+      historyReady: false,
+    });
+    await expect(syncConnection(connectionId, notReady)).rejects.toThrow(/not ready/);
+
+    // The page it did get is committed with its cursor (invariant 1), and the
+    // connection stays `syncing` — never a false "ok" over missing history.
+    expect(await txnCount(connectionId)).toBe(1);
+    expect(await getCursor(connectionId)).toBe("h-cursor");
+    const [row] = await db
+      .select({ status: connections.status })
+      .from(connections)
+      .where(eq(connections.id, connectionId));
+    expect(row!.status).toBe("syncing");
+
+    // Retry once Plaid finishes: resumes from the cursor, completes normally.
+    const ready = async (_t: string, cursor: string | null): Promise<SyncPage> => ({
+      added: cursor === "h-cursor" ? [makeTxn("h2", 18.99, "2026-07-01")] : [],
+      modified: [],
+      removed: [],
+      nextCursor: "h-cursor-2",
+      hasMore: false,
+      historyReady: true,
+    });
+    const result = await syncConnection(connectionId, ready);
+    expect(result.status).toBe("completed");
+    expect(await txnCount(connectionId)).toBe(2);
+
+    await cleanup(userId);
+  });
+
   it("aborts silently for a revoking connection", async () => {
     const { syncConnection } = await import("@/modules/connections/sync");
     const { eq } = await import("drizzle-orm");

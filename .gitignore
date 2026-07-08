@@ -35,3 +35,5 @@ coverage/
 
 # test tooling artifacts
 .playwright-mcp/
+test-results/
+playwright-report/

@@ -68,6 +68,14 @@ export type SyncPage = {
   removed: string[];
   nextCursor: string;
   hasMore: boolean;
+  /**
+   * False while Plaid is still preparing the item's historical pull
+   * (`transactions_update_status` ≠ HISTORICAL_UPDATE_COMPLETE). During that
+   * window Plaid drains to `has_more: false` with near-empty pages, so a sync
+   * stopping there would look complete while holding almost no data. Absent
+   * means unknown — treated as ready.
+   */
+  historyReady?: boolean;
 };
 
 /** One page of /transactions/sync. The caller loops on hasMore. */
@@ -92,12 +100,14 @@ export async function transactionsSyncPage(
     pfcDetailed: t.personal_finance_category?.detailed ?? null,
     legacyCategories: t.category ?? [],
   });
+  const updateStatus = res.data.transactions_update_status as string | undefined;
   return {
     added: res.data.added.map(map),
     modified: res.data.modified.map(map),
     removed: res.data.removed.map((r) => r.transaction_id!),
     nextCursor: res.data.next_cursor,
     hasMore: res.data.has_more,
+    historyReady: updateStatus === undefined || updateStatus === "HISTORICAL_UPDATE_COMPLETE",
   };
 }
 
