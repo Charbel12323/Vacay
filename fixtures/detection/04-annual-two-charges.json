@@ -1,0 +1,31 @@
+{
+  "name": "annual with two charges",
+  "today": "2026-07-20",
+  "merchants": [
+    {
+      "id": "m-prime",
+      "name": "Amazon Prime",
+      "aliases": ["amzn prime", "amazon prime member"],
+      "category": "retail_membership",
+      "knownPlans": [{ "name": "Annual", "amount": "99.00", "cadence": "annual" }]
+    }
+  ],
+  "transactions": [
+    { "id": "t1", "date": "2024-08-15", "amount": "99.00", "descriptor": "AMZN PRIME MEMBER" },
+    { "id": "t2", "date": "2025-08-15", "amount": "99.00", "descriptor": "AMZN PRIME MEMBER" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "amazon prime",
+        "cadence": "annual",
+        "classification": "subscription",
+        "verdict": "question",
+        "maxConfidence": 0.79,
+        "nextExpectedDate": "2026-08-15"
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": ["new_probable_subscription", "renewal_upcoming"]
+  }
+}

@@ -1,5 +1,28 @@
 # Progress log
 
+## Stage 5 — Detection engine (2026-07-07)
+
+**Built:**
+`modules/detection/engine/`: a pure, deterministic TypeScript module (normalize + alias matching, stream grouping with ±15% amount clustering, cadence detection per the stage's bucket table with one-missed-charge tolerance and same-day-of-month vs every-N-days discrimination, weighted-rule classification into subscription/bill/habit with confidence, persistent price-step detection, single-charge probable annuals capped at 0.75, and `runEngine` composing it all with event candidates).
+An ESLint no-restricted-imports rule scoped to `engine/` fails the build on any DB/Plaid/Redis/Node-I/O import.
+`today` is an engine input, so the engine contains no clock and is fully deterministic.
+Merchant seed: ~200 Canada-relevant subscription merchants (streaming, software, telecom, gyms, news, utilities, insurance, gaming…) with aliases, categories, and known plan prices in `src/db/seeds/merchants.json`; `npm run db:seed` upserts by name.
+Migration `0002_detection` adds `subscriptions.stream_key` with a per-user unique constraint — the diff identity for idempotent upserts.
+`modules/detection/orchestrator.ts`: loads the user's world, runs the engine, and persists only diffs — field-level compare before UPDATE, price changes deduped by exact step, alert rows (price_increase, renewal_upcoming) inserted unsent through the unique dedup gate, transaction→subscription links updated only when changed, dismissed/cancelled statuses and user_confirmed never overwritten, `user_confirmed=false` merchants suppressed and fed back as negative signals.
+Connections flip `ok → ready` after the first detection run (replacing the Stage 4 TODO).
+The write-time normalizer now delegates to the engine's canonical noise-strip.
+
+**Verified:**
+Ten-fixture suite in `fixtures/detection/` (clean monthly, missed month, 30-day drift, 2-charge annual, single-charge known annual, price increase, variable phone bill→bill, weekly coffee→habit, PayPal-intermediated→Netflix, two concurrent plans→two streams), each with asserted outputs.
+Property test: shuffled inputs produce deep-equal outputs.
+Invariant 5 test: no stream under 0.80 confidence carries an asserted verdict, across all fixtures.
+Live-DB orchestration test: first run persists subscription/price_change/alert/links; second run changes literally zero rows (updatedAt included); feedback=false dismisses and suppresses.
+End-to-end with a Plaid custom sandbox user (deterministic history): connect → sync → detection produced netflix = monthly/subscription/healthy/0.94 and rogers = monthly/bill/no-verdict/0.79.
+
+**Deviations / notes:**
+Engine events `new_probable_subscription` and `expected_charge_missed` are computed but not persisted to `alerts` — they are not alert types in the schema (Stage 7 defines alert types); only price_increase and renewal_upcoming are persisted, unsent.
+The default sandbox institution only prepares ~30 days of history without webhooks, so the deterministic e2e uses Plaid's custom sandbox user.
+
 ## Stage 4 — Ingestion pipeline (2026-07-07)
 
 **Built:**

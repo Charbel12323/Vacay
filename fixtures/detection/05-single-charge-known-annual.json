@@ -1,0 +1,30 @@
+{
+  "name": "single charge matching a known annual plan",
+  "today": "2026-06-01",
+  "merchants": [
+    {
+      "id": "m-strava",
+      "name": "Strava",
+      "aliases": ["strava inc"],
+      "category": "gym",
+      "knownPlans": [{ "name": "Annual", "amount": "99.99", "cadence": "annual" }]
+    }
+  ],
+  "transactions": [
+    { "id": "t1", "date": "2026-05-10", "amount": "99.99", "descriptor": "STRAVA INC" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "strava",
+        "cadence": "annual",
+        "classification": "subscription",
+        "verdict": "probable_annual",
+        "maxConfidence": 0.75,
+        "nextExpectedDate": "2027-05-10"
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": ["new_probable_subscription"]
+  }
+}

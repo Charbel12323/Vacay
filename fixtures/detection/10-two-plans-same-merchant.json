@@ -1,0 +1,45 @@
+{
+  "name": "two concurrent plans at the same merchant stay separate streams",
+  "today": "2026-07-01",
+  "merchants": [
+    {
+      "id": "m-spotify",
+      "name": "Spotify",
+      "aliases": ["spotify.com"],
+      "category": "music",
+      "knownPlans": []
+    }
+  ],
+  "transactions": [
+    { "id": "a1", "date": "2026-02-05", "amount": "11.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "b1", "date": "2026-02-20", "amount": "18.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "a2", "date": "2026-03-05", "amount": "11.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "b2", "date": "2026-03-20", "amount": "18.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "a3", "date": "2026-04-05", "amount": "11.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "b3", "date": "2026-04-20", "amount": "18.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "a4", "date": "2026-05-05", "amount": "11.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "b4", "date": "2026-05-20", "amount": "18.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "a5", "date": "2026-06-05", "amount": "11.99", "descriptor": "SPOTIFY.COM" },
+    { "id": "b5", "date": "2026-06-20", "amount": "18.99", "descriptor": "SPOTIFY.COM" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "spotify",
+        "cadence": "monthly",
+        "classification": "subscription",
+        "currentAmount": "11.99",
+        "minConfidence": 0.8
+      },
+      {
+        "normalizedMerchant": "spotify",
+        "cadence": "monthly",
+        "classification": "subscription",
+        "currentAmount": "18.99",
+        "minConfidence": 0.8
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": ["new_probable_subscription", "new_probable_subscription"]
+  }
+}

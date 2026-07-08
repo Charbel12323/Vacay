@@ -1,0 +1,34 @@
+{
+  "name": "monthly with one missed month",
+  "today": "2026-07-01",
+  "merchants": [
+    {
+      "id": "m-netflix",
+      "name": "Netflix",
+      "aliases": ["netflix.com"],
+      "category": "streaming",
+      "knownPlans": []
+    }
+  ],
+  "transactions": [
+    { "id": "t1", "date": "2026-01-05", "amount": "18.99", "descriptor": "NETFLIX.COM" },
+    { "id": "t2", "date": "2026-02-05", "amount": "18.99", "descriptor": "NETFLIX.COM" },
+    { "id": "t3", "date": "2026-04-05", "amount": "18.99", "descriptor": "NETFLIX.COM" },
+    { "id": "t4", "date": "2026-05-05", "amount": "18.99", "descriptor": "NETFLIX.COM" },
+    { "id": "t5", "date": "2026-06-05", "amount": "18.99", "descriptor": "NETFLIX.COM" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "netflix",
+        "cadence": "monthly",
+        "classification": "subscription",
+        "verdict": "healthy",
+        "minConfidence": 0.8,
+        "nextExpectedDate": "2026-07-05"
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": ["new_probable_subscription"]
+  }
+}

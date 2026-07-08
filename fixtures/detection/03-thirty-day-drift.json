@@ -1,0 +1,35 @@
+{
+  "name": "every-30-days billing drifts across the month",
+  "today": "2026-07-01",
+  "merchants": [
+    {
+      "id": "m-crave",
+      "name": "Crave",
+      "aliases": ["crave.ca"],
+      "category": "streaming",
+      "knownPlans": []
+    }
+  ],
+  "transactions": [
+    { "id": "t1", "date": "2026-01-25", "amount": "12.99", "descriptor": "CRAVE.CA" },
+    { "id": "t2", "date": "2026-02-24", "amount": "12.99", "descriptor": "CRAVE.CA" },
+    { "id": "t3", "date": "2026-03-26", "amount": "12.99", "descriptor": "CRAVE.CA" },
+    { "id": "t4", "date": "2026-04-25", "amount": "12.99", "descriptor": "CRAVE.CA" },
+    { "id": "t5", "date": "2026-05-25", "amount": "12.99", "descriptor": "CRAVE.CA" },
+    { "id": "t6", "date": "2026-06-24", "amount": "12.99", "descriptor": "CRAVE.CA" }
+  ],
+  "expected": {
+    "streams": [
+      {
+        "normalizedMerchant": "crave",
+        "cadence": "monthly",
+        "classification": "subscription",
+        "sameDayOfMonth": false,
+        "nextExpectedDate": "2026-07-24",
+        "minConfidence": 0.8
+      }
+    ],
+    "priceChangeCount": 0,
+    "eventTypes": ["new_probable_subscription"]
+  }
+}

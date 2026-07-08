@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 import { createRedis } from "@/lib/redis";
 import { enqueueDetection, QUEUE_NAMES } from "@/lib/queues";
 import { syncConnection } from "@/modules/connections/sync";
+import { runDetection } from "@/modules/detection/orchestrator";
 
 // Validate env before anything connects; refuses to boot on missing keys.
 env();
@@ -36,11 +37,15 @@ const syncWorker = new Worker<{ connectionId: string }>("sync", handleSync, {
   connection: createRedis(),
 });
 
-// Placeholder processors; real handlers arrive with their stages.
-const detectionWorker = new Worker(
+/**
+ * Detection handler: runs the pure engine over the user's transactions and
+ * persists the diff. Safe to re-run any time (invariant 4).
+ */
+const detectionWorker = new Worker<{ userId: string; accountIds?: string[] }>(
   "detection",
   async (job) => {
-    console.log(`[worker] detection job ${job.id} received (handler arrives in Stage 5)`);
+    const result = await runDetection(job.data.userId, { accountIds: job.data.accountIds });
+    console.log(`[worker] detection ${job.data.userId}: ${JSON.stringify(result)}`);
   },
   { connection: createRedis() },
 );
