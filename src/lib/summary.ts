@@ -24,6 +24,8 @@ export type Summary = {
     probable_annual: number;
   };
   estimated_monthly_waste: string;
+  /** Monthly equivalent of everything the user cancelled — savings attribution (Stage 8). */
+  total_saved: string;
 };
 
 /**
@@ -35,10 +37,16 @@ export type Summary = {
 export function computeSummary(streams: SummaryStream[], currency = "CAD"): Summary {
   let totalCents = 0;
   let wasteCents = 0;
+  let savedCents = 0;
   let activeCount = 0;
   const flags = { price_increased: 0, likely_forgotten: 0, probable_annual: 0 };
 
   for (const s of streams) {
+    // Cancelled subscriptions accrue to savings — the "finish the job" number.
+    if (s.status === "cancelled" && s.classification === "subscription" && s.cadence) {
+      savedCents += monthlyEquivalentCents(s.currentAmount, s.cadence);
+      continue;
+    }
     if (s.status !== "active") continue;
     if (s.classification !== "subscription") continue;
     if (!s.cadence || !s.verdict || s.verdict === "question") continue;
@@ -61,5 +69,6 @@ export function computeSummary(streams: SummaryStream[], currency = "CAD"): Summ
     active_count: activeCount,
     flags,
     estimated_monthly_waste: centsToString(wasteCents),
+    total_saved: centsToString(savedCents),
   };
 }

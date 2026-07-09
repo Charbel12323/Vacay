@@ -1,5 +1,31 @@
 # Progress log
 
+## Stage 8 — Cancellation assist (2026-07-09)
+
+**Built:**
+`modules/cancellation/`: zod schema for `merchants.cancellation_info` (method web/email/phone/chat, url/email/phone, steps, template_id, difficulty 1-3, notes, mandatory `sources`), validated on every write — the seed aborts on a bad entry.
+Seed fixture `src/db/seeds/cancellations.json`: 57 merchants (streaming, software, VPN/security, gyms, telecom, news, gaming) with official help-center URLs as sources; honest difficulty ratings; retention-script guidance for phone/chat merchants (SiriusXM, Rogers, Bell, Telus, GoodLife…).
+`GET /api/subscriptions/:id/cancellation`: resolves the merchant (by id, falling back to case-insensitive name), returns verified instructions or the generic never-a-404 guidance payload, plus a rendered draft where a written message is usable.
+Message drafting from reviewed fixtures (`message-templates.json`: cancellation + price-match), firm-polite tone, merge-field rendering that throws on any missing field or leftover placeholder; amounts formatted, first name only, `(your name)` placeholder when the account has no name.
+Assist sheet UI: steps checklist, deep-link button, editable + copyable draft, "Mark as cancelled"; wired from verdict rows ("Cancel help") and the detail drawer ("How to cancel").
+Outcome tracking: PATCH whitelist gains `{ status: "cancelled" }` (sets `cancelled_at`); the summary API gains `total_saved` (monthly-normalized sum of cancelled subscriptions) shown on the dashboard; the orchestrator emits `charged_after_cancellation` through Stage 7's dedup gate (key: charge date + amount) when a charge postdates `cancelled_at`.
+Demand telemetry: `assist_opens` (merchant, had_data, created_at) — deliberately no user reference; migration `0004_assist_telemetry`.
+
+**Verified:**
+Every fixture entry and every stored `cancellation_info` payload passes the schema (57 per-merchant tests); each entry has steps + at least one contact path + sources.
+Template tests: all merge fields render, missing fields throw, no leftover placeholders, tone checks.
+Assist tests: seeded merchant → verified payload; price-increased stream → price-match draft with both prices; unknown merchant → generic payload, never 404; cross-user → 404.
+Telemetry: exact column allow-list asserted from information_schema (adding any column fails the test), rows carry no user id.
+Mark-as-cancelled: summary `monthly_recurring` drops and `total_saved` rises in the very next read (route-level test) and in the Playwright e2e (survives reload).
+Fixture test with the real engine: one post-cancellation charge → exactly one `charged_after_cancellation` alert across repeated detection runs; the stream stays cancelled.
+Full suite: 173 tests; extended e2e (connect → verdicts → reject → cancel via assist sheet → savings) green.
+
+**Deviations / notes:**
+No automation against merchant sites anywhere — instructions and drafted messages only, per the explicit product/legal decision in the stage doc.
+The seed covers 57 merchants rather than ~50; entries lean on official help-center URLs, and anything not confidently known stays on the generic path (quality > coverage).
+`charged_after_cancellation`'s dedup key (charge date + amount) is documented in stage7.md's dedup table per its own rule.
+Weekly demand query is a plain SQL one-liner over `assist_opens` (group by merchant where had_data = false); no scheduled job yet — nothing consumes it until coverage work starts.
+
 ## Stage 7 — Alerts & notifications (2026-07-09)
 
 **Built:**

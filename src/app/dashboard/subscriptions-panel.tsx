@@ -8,6 +8,7 @@ import {
   verdictLine,
   type SubscriptionListItem,
 } from "@/lib/verdict-ui";
+import { AssistSheet } from "./assist-sheet";
 
 type Summary = {
   monthly_recurring: string;
@@ -15,6 +16,7 @@ type Summary = {
   active_count: number;
   flags: { price_increased: number; likely_forgotten: number; probable_annual: number };
   estimated_monthly_waste: string;
+  total_saved: string;
   as_of: string | null;
 };
 
@@ -66,6 +68,7 @@ export function SubscriptionsPanel() {
   const [items, setItems] = useState<SubscriptionListItem[] | null>(null);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
+  const [assistItem, setAssistItem] = useState<SubscriptionListItem | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -109,6 +112,7 @@ export function SubscriptionsPanel() {
       return;
     }
     if (detailId === item.id) setDetailId(null);
+    if (assistItem?.id === item.id) setAssistItem(null);
     await refresh();
   }
 
@@ -150,6 +154,11 @@ export function SubscriptionsPanel() {
           <div style={{ color: "#888", fontSize: "0.8rem" }}>
             {summary.active_count} active subscription{summary.active_count === 1 ? "" : "s"}
           </div>
+          {summary.total_saved !== "0.00" && (
+            <div style={{ color: "#15803d", fontSize: "0.8rem" }} data-testid="total-saved">
+              Saved {formatMoney(summary.total_saved, summary.currency)}/mo by cancelling
+            </div>
+          )}
         </div>
         <div style={card}>
           <div style={{ color: "#666", fontSize: "0.85rem" }}>Price increases found</div>
@@ -173,8 +182,18 @@ export function SubscriptionsPanel() {
         </p>
       ) : (
         <>
-          <Group title="Price increases" items={groups.price_increased} onOpen={setDetailId} />
-          <Group title="Likely forgotten" items={groups.likely_forgotten} onOpen={setDetailId} />
+          <Group
+            title="Price increases"
+            items={groups.price_increased}
+            onOpen={setDetailId}
+            onAssist={setAssistItem}
+          />
+          <Group
+            title="Likely forgotten"
+            items={groups.likely_forgotten}
+            onOpen={setDetailId}
+            onAssist={setAssistItem}
+          />
 
           {groups.questions.length > 0 && (
             <div style={{ marginTop: "1.5rem" }}>
@@ -204,7 +223,12 @@ export function SubscriptionsPanel() {
             </div>
           )}
 
-          <Group title="Healthy" items={groups.healthy} onOpen={setDetailId} />
+          <Group
+            title="Healthy"
+            items={groups.healthy}
+            onOpen={setDetailId}
+            onAssist={setAssistItem}
+          />
         </>
       )}
 
@@ -214,6 +238,18 @@ export function SubscriptionsPanel() {
           onClose={() => setDetailId(null)}
           onNotSubscription={() => void patch(detail.subscription, { user_confirmed: false })}
           onDismiss={() => void patch(detail.subscription, { status: "dismissed" })}
+          onAssist={() => {
+            setAssistItem(detail.subscription);
+            setDetailId(null);
+          }}
+        />
+      )}
+
+      {assistItem && (
+        <AssistSheet
+          subscriptionId={assistItem.id}
+          onClose={() => setAssistItem(null)}
+          onMarkCancelled={() => void patch(assistItem, { status: "cancelled" })}
         />
       )}
     </section>
@@ -237,10 +273,12 @@ function Group({
   title,
   items,
   onOpen,
+  onAssist,
 }: {
   title: string;
   items: SubscriptionListItem[];
   onOpen: (id: string) => void;
+  onAssist: (item: SubscriptionListItem) => void;
 }) {
   if (items.length === 0) return null;
   return (
@@ -262,7 +300,9 @@ function Group({
             <button type="button" onClick={() => onOpen(item.id)}>
               Details
             </button>
-            {/* Action button placeholder — Stage 8 wires cancellation assist. */}
+            <button type="button" onClick={() => onAssist(item)} data-testid="assist-open">
+              Cancel help
+            </button>
           </div>
         </div>
       ))}
@@ -275,11 +315,13 @@ function DetailDrawer({
   onClose,
   onNotSubscription,
   onDismiss,
+  onAssist,
 }: {
   detail: Detail;
   onClose: () => void;
   onNotSubscription: () => void;
   onDismiss: () => void;
+  onAssist: () => void;
 }) {
   const s = detail.subscription;
   return (
@@ -354,6 +396,9 @@ function DetailDrawer({
       </ul>
 
       <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+        <button type="button" onClick={onAssist} data-testid="drawer-assist">
+          How to cancel
+        </button>
         <button type="button" onClick={onNotSubscription}>
           Not a subscription
         </button>

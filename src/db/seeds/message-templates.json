@@ -1,0 +1,10 @@
+{
+  "cancellation": {
+    "subject": "Cancellation request — {{merchant}} subscription",
+    "body": "Hello,\n\nI'd like to cancel my {{merchant}} subscription ({{amount}} {{cadence_label}}), effective at the end of the current billing period.\n\nPlease confirm in writing:\n1. That the subscription is cancelled and no further charges will be made.\n2. The date of the final billing period.\n\nI'm not looking for a pause or a discounted plan — please process the cancellation.\n\nThank you,\n{{first_name}}"
+  },
+  "price_match": {
+    "subject": "Price increase on my {{merchant}} subscription",
+    "body": "Hello,\n\nMy {{merchant}} subscription recently went from {{old_price}} to {{new_price}} {{cadence_label}}. I've been a paying customer and I'd like to keep the service, but not at the new price.\n\nCould you keep my subscription at {{old_price}}, or offer an equivalent plan or credit? If that's not possible, please let me know and I'll consider cancelling before the next billing date.\n\nThank you,\n{{first_name}}"
+  }
+}

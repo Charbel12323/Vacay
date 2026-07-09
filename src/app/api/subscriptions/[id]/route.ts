@@ -92,10 +92,12 @@ export const GET = withErrorHandling(async (_req: NextRequest, context: Context)
   });
 });
 
-// Whitelist body: EXACTLY { user_confirmed: boolean } or { status: "dismissed" }.
+// Whitelist body: EXACTLY { user_confirmed: boolean } or
+// { status: "dismissed" | "cancelled" } ("cancelled" added by Stage 8's
+// mark-as-cancelled action). Anything else is 422.
 const patchSchema = z.union([
   z.object({ user_confirmed: z.boolean() }).strict(),
-  z.object({ status: z.literal("dismissed") }).strict(),
+  z.object({ status: z.enum(["dismissed", "cancelled"]) }).strict(),
 ]);
 
 /**
@@ -111,7 +113,7 @@ export const PATCH = withErrorHandling(async (req: NextRequest, context: Context
   if (!parsed.success) {
     throw new ApiError(
       "VALIDATION_FAILED",
-      'Body must be exactly { user_confirmed: boolean } or { status: "dismissed" }.',
+      'Body must be exactly { user_confirmed: boolean } or { status: "dismissed" | "cancelled" }.',
     );
   }
   const body = parsed.data;
@@ -145,7 +147,13 @@ export const PATCH = withErrorHandling(async (req: NextRequest, context: Context
     } else {
       await tx
         .update(subscriptions)
-        .set({ status: "dismissed", updatedAt: new Date() })
+        .set({
+          status: body.status,
+          // Outcome tracking (Stage 8): cancelled_at anchors both the savings
+          // figure and post-cancellation charge detection.
+          cancelledAt: body.status === "cancelled" ? new Date() : null,
+          updatedAt: new Date(),
+        })
         .where(eq(subscriptions.id, row.id));
     }
   });

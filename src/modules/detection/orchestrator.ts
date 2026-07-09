@@ -122,6 +122,25 @@ export async function runDetection(
       if (row.status === "dismissed" || row.status === "cancelled") {
         next.status = row.status;
       }
+
+      // Stage 8 outcome tracking: a charge landing AFTER the user cancelled
+      // is alert-worthy. Through the dedup gate (date:amount), so re-running
+      // detection over the same charge never re-alerts.
+      if (
+        row.status === "cancelled" &&
+        row.cancelledAt &&
+        stream.lastChargeDate &&
+        stream.lastChargeDate > row.cancelledAt.toISOString().slice(0, 10)
+      ) {
+        const alertId = await insertAlert(tx, {
+          userId,
+          subscriptionId: row.id,
+          type: "charged_after_cancellation",
+          dedupKey: `${stream.lastChargeDate}:${stream.currentAmount}`,
+          payload: { charge_date: stream.lastChargeDate, amount: stream.currentAmount },
+        });
+        if (alertId) insertedAlertIds.push(alertId);
+      }
       if (rowChanged(row, next)) {
         await tx
           .update(subscriptions)

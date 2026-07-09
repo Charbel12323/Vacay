@@ -136,10 +136,11 @@ describe.skipIf(!hasDb)("subscriptions APIs (live DB)", () => {
     expect(body.evidence).toHaveLength(2);
     expect(body.evidence[0].raw_descriptor).toBe("NETFLIX.COM");
 
-    // PATCH whitelist: anything else is 422.
+    // PATCH whitelist: anything else is 422. ({ status: "cancelled" } joined
+    // the whitelist in Stage 8's mark-as-cancelled.)
     for (const bad of [
       { user_confirmed: true, status: "dismissed" },
-      { status: "cancelled" },
+      { status: "active" },
       { verdict: "healthy" },
       { user_confirmed: "yes" },
       {},

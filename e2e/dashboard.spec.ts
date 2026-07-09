@@ -142,4 +142,24 @@ test("connect a sandbox bank, see verdicts, reject one stream", async ({ page, r
   await page.reload();
   await expect(netflixRow).toHaveCount(1);
   await expect(spotifyRow).toHaveCount(0);
+
+  // -- Stage 8: cancellation assist. Netflix is a seeded merchant, so the
+  //    sheet shows verified steps and a real deep link.
+  await netflixRow.getByTestId("assist-open").click();
+  const sheet = page.getByTestId("assist-sheet");
+  await expect(sheet).toBeVisible();
+  await expect(sheet.getByRole("heading", { name: "Cancel Netflix" })).toBeVisible();
+  expect(await sheet.locator("li").count()).toBeGreaterThanOrEqual(2);
+  await expect(sheet.getByTestId("assist-deep-link")).toHaveAttribute("href", /netflix\.com/);
+
+  // -- Mark as cancelled: the row leaves the list and the summary's savings
+  //    figure appears immediately (read-your-own-writes), surviving reload.
+  await sheet.getByTestId("mark-cancelled").click();
+  await expect(sheet).toBeHidden();
+  await expect(netflixRow).toHaveCount(0);
+  await expect(page.getByTestId("total-saved")).toContainText("18.99");
+
+  await page.reload();
+  await expect(netflixRow).toHaveCount(0);
+  await expect(page.getByTestId("total-saved")).toContainText("18.99");
 });
