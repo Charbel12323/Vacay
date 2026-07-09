@@ -48,11 +48,13 @@ export async function syncConnection(
   let pages = 0;
   let upserted = 0;
   let removed = 0;
+  let historyReady = true;
 
   try {
     let hasMore = true;
     while (hasMore) {
       const page = await fetchPage(accessToken, cursor);
+      historyReady = page.historyReady ?? true;
       const rows = await buildRows(page, accountIdByPlaidId);
 
       // ONE transaction per page: upserts, removals, AND the cursor advance.
@@ -105,7 +107,15 @@ export async function syncConnection(
     throw err;
   }
 
-  // TODO(stage-05): flip to `ready` after the first detection run completes.
+  // Plaid drained its cursor but is still preparing the historical pull.
+  // Committed pages and the cursor are safe; throw so the queue's backoff
+  // retries, which resumes from the cursor and picks up the backfill. The
+  // connection stays `syncing`, so the UI honestly keeps "Analyzing…" rather
+  // than reporting ready on top of an almost-empty history.
+  if (!historyReady) {
+    throw new Error("Plaid historical transaction pull not ready yet; retrying");
+  }
+
   await db
     .update(connections)
     .set({ status: "ok", lastSyncedAt: new Date(), updatedAt: new Date() })

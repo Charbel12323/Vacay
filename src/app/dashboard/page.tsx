@@ -1,5 +1,6 @@
 import { auth, signOut } from "@/lib/auth";
 import { ConnectionsPanel } from "./connections-panel";
+import { SubscriptionsPanel } from "./subscriptions-panel";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -20,6 +21,7 @@ export default async function DashboardPage() {
         </form>
       </header>
       <p>Signed in as {session?.user?.email}.</p>
+      <SubscriptionsPanel />
       <ConnectionsPanel />
     </main>
   );
