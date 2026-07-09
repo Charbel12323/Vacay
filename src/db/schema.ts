@@ -97,6 +97,10 @@ export const connections = pgTable(
     cursor: text("cursor"),
     status: connectionStatusEnum("status").notNull().default("pending"),
     lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
+    // When detection last ran over this connection's transactions. The daily
+    // reconciliation sweep compares this to the newest ingested transaction
+    // to catch lost detection events (Stage 7).
+    lastDetectionAt: timestamp("last_detection_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -238,4 +242,24 @@ export const alerts = pgTable(
       .nullsNotDistinct(),
     index("alerts_user_id_created_at_idx").on(table.userId, table.createdAt),
   ],
+);
+
+/**
+ * Per-type email preferences (Stage 7). Rows are explicit user overrides;
+ * absence means the code default applies (price increase and renewal ON,
+ * upcoming charge ON for annual/quarterly cadences but OFF for monthly).
+ * reauth_required is transactional and has no row — it cannot be disabled.
+ */
+export const alertPreferences = pgTable(
+  "alert_preferences",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: alertTypeEnum("type").notNull(),
+    emailEnabled: boolean("email_enabled").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique("alert_preferences_user_type_uq").on(table.userId, table.type)],
 );

@@ -54,3 +54,35 @@ export async function enqueueDetection(userId: string): Promise<void> {
     },
   );
 }
+
+/**
+ * Enqueue email dispatch for one alert row. Called only AFTER the alert
+ * insert committed (invariant 2 — truth before announce). jobId = alert id,
+ * so a double-enqueue collapses while the job is queued or running; the
+ * dispatch handler's `sent_at` check guards redelivery after that.
+ */
+export async function enqueueAlertDispatch(alertId: string): Promise<void> {
+  await getQueues().alerts.add(
+    "dispatch",
+    { alertId },
+    {
+      jobId: alertId,
+      attempts: 5,
+      backoff: { type: "exponential", delay: 30_000 },
+      removeOnComplete: true,
+      removeOnFail: false,
+    },
+  );
+}
+
+/**
+ * Register the daily scans as a BullMQ job scheduler (worker boot). Runs at
+ * 11:00 UTC — morning across Canadian timezones. Upsert is idempotent.
+ */
+export async function registerDailyScans(): Promise<void> {
+  await getQueues().alerts.upsertJobScheduler(
+    "daily-scans",
+    { pattern: "0 11 * * *" },
+    { name: "daily-scans", opts: { removeOnComplete: true, removeOnFail: false } },
+  );
+}

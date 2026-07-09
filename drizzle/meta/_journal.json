@@ -22,6 +22,13 @@
       "when": 1783446703453,
       "tag": "0002_detection",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783606363483,
+      "tag": "0003_alerts",
+      "breakpoints": true
     }
   ]
 }

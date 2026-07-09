@@ -1,5 +1,34 @@
 # Progress log
 
+## Stage 7 — Alerts & notifications (2026-07-09)
+
+**Built:**
+`modules/alerts/create.ts` — every alert is born through one unique insert on `(subscription_id, type, dedup_key)` (invariant 4); dedup key conventions documented in the module (price step, expected date, connection+ISO-week).
+Email dispatch is enqueued only after the row commits (invariant 2), with jobId = alert id.
+`modules/alerts/dispatch.ts` — work-before-acknowledge dispatch (invariant 3): render → send via Resend (with an Idempotency-Key) → stamp `sent_at` → complete.
+Redelivery hits the `sent_at` guard and skips; retries exhausted → `send_failed`, alert stays in-app-only.
+Without a real Resend key ("re_…"), sends are skipped honestly — alerts stay in-app-only, `sent_at` stays NULL.
+react-email templates for price increase, renewal, upcoming charge, and reauth: calm, evidence-first copy, dashboard + preferences links, class-based dark-mode overrides.
+Detection orchestrator now routes engine events through the creation gate and enqueues dispatch after its transaction commits; it also stamps `connections.last_detection_at` each run.
+Daily scans (BullMQ job scheduler, 11:00 UTC): renewal scan (annual/quarterly, ≤30 days), upcoming-charge scan (≤3 days, all cadences in-app), staleness scan (no sync in 3 days → `degraded` + weekly-deduped reauth alert), and the reconciliation sweep (newest ingested transaction postdates `last_detection_at` → re-enqueue detection).
+In-app feed: `GET /api/alerts` (keyset pagination + unread count), `PATCH /api/alerts/:id` accepting exactly `{ read: true }`; bell with unread badge and feed panel on the dashboard, optimistic mark-read with revert-on-error.
+Preferences: `alert_preferences` table (explicit overrides only), `/api/alerts/preferences` GET/PATCH, and a `/settings` page; defaults are ON except upcoming-charge, which defaults ON only for annual/quarterly (monthly is too noisy); reauth emails cannot be disabled.
+Migration `0003_alerts` (alert_preferences + connections.last_detection_at).
+
+**Verified:**
+Firing the same event 10× produces exactly one row and one send; redelivery after send-but-before-completion does not double-send; permanent failure flags `send_failed` without a fake `sent_at`.
+Renewal scan honors the 30-day window edge, skips monthly cadences, and re-runs create nothing; staleness scan degrades and alerts once per week; the reconciliation sweep heals a manufactured lost-event and goes quiet once detection catches up.
+Email snapshots for all four templates; dark-mode block, dashboard/preferences links asserted; no raw descriptors and nothing beyond the 4-digit mask in rendered text.
+Feed pagination has no overlap across pages; unread counts stay exact under concurrent reads and writes; PATCH whitelist and cross-user 404 enforced.
+Full suite: 101 tests, stage 6 Playwright e2e still green, UI verified in a real browser (bell badge, feed copy, mark-read decrement, settings toggles persisting).
+
+**Deviations / notes:**
+Fixed a Stage 6 pagination bug the feed tests exposed: cursors encoded `created_at` as a JS ISO string, losing Postgres microseconds, so keyset pagination dropped rows created in the same batch.
+Both alerts and subscriptions cursors now anchor on the cursor row id and compare `(created_at, id)` tuples server-side.
+`upcoming_charge` alerts are created in-app for every cadence; the noisiness rule lives in the email preference default, not in alert creation ("when in doubt, in-app-only" — the feed is cheap).
+`charged_after_cancellation` exists in the type enum and templates but nothing emits it yet (Stage 8 wires cancellation state).
+Engine events `new_probable_subscription` and `expected_charge_missed` remain non-alert engine outputs, as decided in Stage 5.
+
 ## Stage 6 — Dashboard & product APIs (2026-07-08)
 
 **Built:**

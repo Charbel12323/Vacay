@@ -5,7 +5,9 @@ import { db } from "@/db/client";
 import { connections } from "@/db/schema";
 import { env } from "@/lib/env";
 import { createRedis } from "@/lib/redis";
-import { enqueueDetection, QUEUE_NAMES } from "@/lib/queues";
+import { enqueueDetection, QUEUE_NAMES, registerDailyScans } from "@/lib/queues";
+import { dispatchAlert, markSendFailed } from "@/modules/alerts/dispatch";
+import { runDailyScans } from "@/modules/alerts/scans";
 import { syncConnection } from "@/modules/connections/sync";
 import { runDetection } from "@/modules/detection/orchestrator";
 
@@ -50,15 +52,44 @@ const detectionWorker = new Worker<{ userId: string; accountIds?: string[] }>(
   { connection: createRedis() },
 );
 
-const alertsWorker = new Worker(
+/**
+ * Alerts queue: email dispatch jobs plus the daily scheduled scans. Dispatch
+ * is work-before-acknowledge — the job completes only after the send and the
+ * sent_at write; redelivery is guarded by the sent_at check inside.
+ */
+const alertsWorker = new Worker<{ alertId?: string }>(
   "alerts",
   async (job) => {
-    console.log(`[worker] alerts job ${job.id} received (handler arrives in Stage 7)`);
+    if (job.name === "daily-scans") {
+      const result = await runDailyScans();
+      console.log(`[worker] daily scans: ${JSON.stringify(result)}`);
+      return;
+    }
+    const outcome = await dispatchAlert(job.data.alertId!);
+    console.log(`[worker] alert ${job.data.alertId}: ${outcome}`);
   },
   { connection: createRedis() },
 );
 
+alertsWorker.on("failed", (job, err) => {
+  // Retries exhausted → the alert stays in-app-only, flagged send_failed.
+  if (
+    job?.name === "dispatch" &&
+    job.data.alertId &&
+    job.attemptsMade >= (job.opts.attempts ?? 1)
+  ) {
+    void markSendFailed(job.data.alertId).then(() =>
+      console.error(`[worker] alert ${job.data.alertId} marked send_failed: ${err.message}`),
+    );
+  }
+});
+
 const workers = [syncWorker, detectionWorker, alertsWorker];
+
+// Idempotent upsert of the daily scan schedule (11:00 UTC).
+void registerDailyScans().catch((err) =>
+  console.error(`[worker] failed to register daily scans: ${err.message}`),
+);
 
 syncWorker.on("failed", (job, err) => {
   console.error(
