@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { and, desc, eq, lt, or, type SQL } from "drizzle-orm";
+import { and, desc, eq, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { accounts, merchants, subscriptions } from "@/db/schema";
@@ -34,13 +34,12 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
   if (verdict) filters.push(eq(subscriptions.verdict, verdict));
   if (account_id) filters.push(eq(subscriptions.accountId, account_id));
   if (cursor) {
-    const { sortValue, id } = decodeCursor(cursor);
-    const created = new Date(sortValue);
+    // Anchor on the cursor row server-side: a JS ISO timestamp loses
+    // Postgres microseconds, which breaks keyset filters for rows created in
+    // the same batch (e.g. one detection run inserting many streams).
+    const { id } = decodeCursor(cursor);
     filters.push(
-      or(
-        lt(subscriptions.createdAt, created),
-        and(eq(subscriptions.createdAt, created), lt(subscriptions.id, id)),
-      )!,
+      sql`(${subscriptions.createdAt}, ${subscriptions.id}) < (select s.created_at, s.id from subscriptions s where s.id = ${id})`,
     );
   }
 

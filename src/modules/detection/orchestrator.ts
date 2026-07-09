@@ -2,13 +2,14 @@ import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   accounts,
-  alerts,
   connections,
   merchants,
   priceChanges,
   subscriptions,
   transactions,
 } from "@/db/schema";
+import { enqueueAlertDispatch } from "@/lib/queues";
+import { insertAlert } from "@/modules/alerts/create";
 import { runEngine } from "./engine";
 import type {
   EngineEvent,
@@ -95,6 +96,7 @@ export async function runDetection(
   let created = 0;
   let updated = 0;
   let eventsPersisted = 0;
+  const insertedAlertIds: string[] = [];
 
   await db.transaction(async (tx) => {
     const idByStreamKey = new Map<string, string>();
@@ -169,11 +171,14 @@ export async function runDetection(
       }
     }
 
-    // Persist alertable events unsent (Stage 7 dispatches). The unique
-    // (subscription_id, type, dedup_key) gate makes this idempotent.
+    // Persist alertable events through the dedup gate (invariant 4). Dispatch
+    // is enqueued after this transaction commits, never inside it.
     for (const event of output.events) {
-      const persisted = await persistEvent(tx, userId, event, idByStreamKey);
-      if (persisted) eventsPersisted++;
+      const alertId = await persistEvent(tx, userId, event, idByStreamKey);
+      if (alertId) {
+        insertedAlertIds.push(alertId);
+        eventsPersisted++;
+      }
     }
 
     // First detection done: connections graduate from ok to ready.
@@ -181,7 +186,20 @@ export async function runDetection(
       .update(connections)
       .set({ status: "ready", updatedAt: new Date() })
       .where(and(eq(connections.userId, userId), eq(connections.status, "ok")));
+
+    // Stamp the run so the daily reconciliation sweep can spot connections
+    // whose transactions are newer than their last detection.
+    await tx
+      .update(connections)
+      .set({ lastDetectionAt: new Date() })
+      .where(eq(connections.userId, userId));
   });
+
+  // Truth before announce (invariant 2): the alert rows are durably committed
+  // above; only now may email dispatch be enqueued.
+  for (const alertId of insertedAlertIds) {
+    await enqueueAlertDispatch(alertId);
+  }
 
   return { streams: output.streams.length, created, updated, events: eventsPersisted };
 }
@@ -229,18 +247,19 @@ function rowChanged(row: typeof subscriptions.$inferSelect, next: SubscriptionRo
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /**
- * Map engine events to alert rows (unsent — Stage 7 adds dispatch). Only
+ * Map engine events to alert rows via the Stage 7 creation gate. Only
  * price_increased and renewal_upcoming are alert types; the other events are
- * engine outputs consumed elsewhere. Dedup keys follow Stage 7's conventions.
+ * engine outputs consumed elsewhere. Returns the new alert id, or null when
+ * the event maps to nothing or was already alerted.
  */
 async function persistEvent(
   tx: Tx,
   userId: string,
   event: EngineEvent,
   idByStreamKey: Map<string, string>,
-): Promise<boolean> {
+): Promise<string | null> {
   const subscriptionId = idByStreamKey.get(event.streamKey);
-  if (!subscriptionId) return false;
+  if (!subscriptionId) return null;
 
   let type: "price_increase" | "renewal_upcoming";
   let dedupKey: string;
@@ -259,15 +278,8 @@ async function persistEvent(
     dedupKey = event.expectedDate;
     payload = { expected_date: event.expectedDate };
   } else {
-    return false;
+    return null;
   }
 
-  const inserted = await tx
-    .insert(alerts)
-    .values({ userId, subscriptionId, type, dedupKey, payload })
-    .onConflictDoNothing({
-      target: [alerts.subscriptionId, alerts.type, alerts.dedupKey],
-    })
-    .returning({ id: alerts.id });
-  return inserted.length > 0;
+  return insertAlert(tx, { userId, subscriptionId, type, dedupKey, payload });
 }

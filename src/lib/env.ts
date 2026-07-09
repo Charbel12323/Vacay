@@ -8,6 +8,12 @@ const envSchema = z.object({
   PLAID_ENV: z.enum(["sandbox", "development", "production"]).default("sandbox"),
   TOKEN_ENC_KEY: z.string().min(32, "TOKEN_ENC_KEY must be at least 32 characters"),
   RESEND_API_KEY: z.string().min(1),
+  // Sender identity for alert emails. Dispatch only attempts real sends when
+  // RESEND_API_KEY looks like a real key ("re_…"); otherwise alerts stay
+  // in-app-only, so local placeholders never produce doomed send attempts.
+  EMAIL_FROM: z.string().default("SubTracker <alerts@subtracker.app>"),
+  // Base URL for links inside emails (dashboard, preferences).
+  APP_BASE_URL: z.string().url().default("http://127.0.0.1:3000"),
   AUTH_SECRET: z.string().min(1),
   // Optional: Google sign-in is offered only when both are set.
   GOOGLE_CLIENT_ID: z.string().optional(),
