@@ -1,5 +1,7 @@
-node_modules/
+# generated artifacts
 .next/
+node_modules/
+test-results/
+playwright-report/
+results.sarif
 drizzle/meta/
-package-lock.json
-coverage/
