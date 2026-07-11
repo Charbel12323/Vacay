@@ -1,7 +1,9 @@
 import { and, eq, gte, inArray, lte, lt, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { accounts, connections, subscriptions, transactions } from "@/db/schema";
-import { enqueueAlertDispatch, enqueueDetection } from "@/lib/queues";
+import { enqueueAlertDispatch, enqueueDetection, enqueueSync } from "@/lib/queues";
+import { decryptToken } from "@/modules/connections/crypto";
+import { isItemGone, removeItem } from "@/modules/connections/plaid";
 import { createAlert, insertAlert, reauthDedupKey } from "./create";
 
 /**
@@ -14,12 +16,15 @@ import { createAlert, insertAlert, reauthDedupKey } from "./create";
 const RENEWAL_WINDOW_DAYS = 30;
 const UPCOMING_WINDOW_DAYS = 3;
 const STALE_AFTER_DAYS = 3;
+const STUCK_SYNC_MINUTES = 30;
 
 /** Cadences whose renewals are worth a 30-day heads-up. */
 const RENEWAL_CADENCES = ["annual", "quarterly"] as const;
 
 export type ScanDeps = {
   enqueueDetectionFn?: typeof enqueueDetection;
+  enqueueSyncFn?: typeof enqueueSync;
+  removeItemFn?: typeof removeItem;
 };
 
 export type ScanResult = {
@@ -27,6 +32,8 @@ export type ScanResult = {
   upcoming: number;
   stale: number;
   reconciled: number;
+  resynced: number;
+  revoked: number;
 };
 
 export async function runDailyScans(now = new Date(), deps: ScanDeps = {}): Promise<ScanResult> {
@@ -34,7 +41,9 @@ export async function runDailyScans(now = new Date(), deps: ScanDeps = {}): Prom
   const upcoming = await upcomingChargeScan(now);
   const stale = await stalenessScan(now);
   const reconciled = await reconciliationSweep(deps.enqueueDetectionFn ?? enqueueDetection);
-  return { renewals, upcoming, stale, reconciled };
+  const resynced = await stuckSyncScan(now, deps.enqueueSyncFn ?? enqueueSync);
+  const revoked = await orphanedRevokingScan(deps.removeItemFn ?? removeItem);
+  return { renewals, upcoming, stale, reconciled, resynced, revoked };
 }
 
 /** Annual/quarterly subscriptions renewing within 30 days → renewal alert. */
@@ -181,6 +190,46 @@ export async function reconciliationSweep(
   const userIds = [...new Set(behind.map((b) => b.userId))];
   for (const userId of userIds) await enqueue(userId);
   return userIds.length;
+}
+
+/**
+ * Connections stuck in `syncing` for 30+ minutes lost their job somewhere
+ * (worker crash after the status write, Redis hiccup). Re-enqueue; sync is
+ * idempotent and resumes from the stored cursor (Stage 9 task 3).
+ */
+export async function stuckSyncScan(
+  now: Date,
+  enqueue: typeof enqueueSync = enqueueSync,
+): Promise<number> {
+  const cutoff = new Date(now.getTime() - STUCK_SYNC_MINUTES * 60_000);
+  const stuck = await db
+    .select({ id: connections.id })
+    .from(connections)
+    .where(and(eq(connections.status, "syncing"), lt(connections.updatedAt, cutoff)));
+  for (const conn of stuck) await enqueue(conn.id);
+  return stuck.length;
+}
+
+/**
+ * Connections stranded in `revoking` mean a disconnect or purge died between
+ * the status write and the row delete. Finish the job: remove the Item at
+ * Plaid (already-gone counts as done) and delete the row.
+ */
+export async function orphanedRevokingScan(
+  removeItemFn: typeof removeItem = removeItem,
+): Promise<number> {
+  const orphans = await db.select().from(connections).where(eq(connections.status, "revoking"));
+  let finished = 0;
+  for (const conn of orphans) {
+    try {
+      await removeItemFn(decryptToken(conn.accessTokenEnc));
+    } catch (err) {
+      if (!isItemGone(err)) continue; // Plaid still down — next sweep retries
+    }
+    await db.delete(connections).where(eq(connections.id, conn.id));
+    finished++;
+  }
+  return finished;
 }
 
 function isoDate(d: Date): string {

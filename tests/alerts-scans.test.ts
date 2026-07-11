@@ -224,6 +224,69 @@ describe.skipIf(!hasDb)("daily scans (live DB)", () => {
     await cleanup(userId);
   });
 
+  it("re-enqueues connections stuck in syncing for 30+ minutes", async () => {
+    const { stuckSyncScan } = await import("@/modules/alerts/scans");
+    const { eq } = await import("drizzle-orm");
+    const { db } = await import("@/db/client");
+    const { connections } = await import("@/db/schema");
+
+    const now = new Date();
+    const marker = `scan-e-${Date.now().toString(36)}`;
+    const { userId, connectionId } = await setupWorld(marker);
+
+    // Stuck: syncing with no progress for 40 minutes.
+    await db
+      .update(connections)
+      .set({ status: "syncing", updatedAt: new Date(now.getTime() - 40 * 60_000) })
+      .where(eq(connections.id, connectionId));
+
+    const resynced: string[] = [];
+    await stuckSyncScan(now, async (id) => {
+      resynced.push(id);
+    });
+    expect(resynced).toContain(connectionId);
+
+    // Freshly-started syncs are left alone.
+    await db
+      .update(connections)
+      .set({ updatedAt: new Date() })
+      .where(eq(connections.id, connectionId));
+    const resyncedAfter: string[] = [];
+    await stuckSyncScan(now, async (id) => {
+      resyncedAfter.push(id);
+    });
+    expect(resyncedAfter).not.toContain(connectionId);
+
+    await cleanup(userId);
+  });
+
+  it("finishes the purge for orphaned revoking connections", async () => {
+    const { orphanedRevokingScan } = await import("@/modules/alerts/scans");
+    const { eq } = await import("drizzle-orm");
+    const { db } = await import("@/db/client");
+    const { connections } = await import("@/db/schema");
+
+    const marker = `scan-f-${Date.now().toString(36)}`;
+    const { userId, connectionId } = await setupWorld(marker);
+    await db
+      .update(connections)
+      .set({ status: "revoking" })
+      .where(eq(connections.id, connectionId));
+
+    // Plaid says the Item is already gone — that still finishes the purge.
+    const itemGone = Object.assign(new Error("gone"), {
+      response: { data: { error_code: "ITEM_NOT_FOUND" } },
+    });
+    await orphanedRevokingScan(async () => {
+      throw itemGone;
+    });
+
+    const [row] = await db.select().from(connections).where(eq(connections.id, connectionId));
+    expect(row).toBeUndefined();
+
+    await cleanup(userId);
+  });
+
   afterAll(async () => {
     if (!hasDb) return;
     const { sql } = await import("@/db/client");

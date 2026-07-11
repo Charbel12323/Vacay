@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DeleteAccount } from "./delete-account";
 import { PreferencesForm } from "./preferences-form";
 
 export default function SettingsPage() {
@@ -25,6 +26,8 @@ export default function SettingsPage() {
           fail silently and you would stop seeing new charges.
         </p>
       </section>
+
+      <DeleteAccount />
     </main>
   );
 }

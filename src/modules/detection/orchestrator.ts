@@ -8,6 +8,7 @@ import {
   subscriptions,
   transactions,
 } from "@/db/schema";
+import { invalidateUserDashboards } from "@/lib/cache";
 import { enqueueAlertDispatch } from "@/lib/queues";
 import { insertAlert } from "@/modules/alerts/create";
 import { runEngine } from "./engine";
@@ -213,6 +214,9 @@ export async function runDetection(
       .set({ lastDetectionAt: new Date() })
       .where(eq(connections.userId, userId));
   });
+
+  // Fresh verdicts are committed: the user's cached dashboards are stale.
+  await invalidateUserDashboards(userId);
 
   // Truth before announce (invariant 2): the alert rows are durably committed
   // above; only now may email dispatch be enqueued.
