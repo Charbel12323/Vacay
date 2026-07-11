@@ -7,10 +7,11 @@ import { enqueueAlertDispatch } from "@/lib/queues";
  *
  * Every alert in the system is born here, through one unique insert on
  * (subscription_id, type, dedup_key). Dedup key conventions (stage doc):
- *   price_increase   → "{old}->{new}"
- *   renewal_upcoming → the expected renewal date (YYYY-MM-DD)
- *   upcoming_charge  → the expected charge date (YYYY-MM-DD)
- *   reauth_required  → "{connectionId}:{ISO week}", e.g. "…:2026-W28"
+ *   price_increase              → "{old}->{new}"
+ *   renewal_upcoming            → the expected renewal date (YYYY-MM-DD)
+ *   upcoming_charge             → the expected charge date (YYYY-MM-DD)
+ *   reauth_required             → "{connectionId}:{ISO week}", e.g. "…:2026-W28"
+ *   charged_after_cancellation  → "{charge date}:{amount}" (Stage 8)
  * New alert types must document their dedup_key in stages/stage7.md first.
  */
 

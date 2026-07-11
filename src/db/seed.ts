@@ -1,9 +1,10 @@
 import "dotenv/config";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, sql as pg } from "@/db/client";
 import { merchants } from "@/db/schema";
+import { cancellationInfoSchema } from "@/modules/cancellation/schema";
 
 /**
  * Seeds the shared merchants table from the reviewed JSON fixture.
@@ -43,6 +44,28 @@ async function main() {
     sql`select count(*)::int as count from merchants`,
   )) as unknown as [{ count: number }];
   console.log(`[seed] merchants seeded: ${seed.length} upserted, ${count} total`);
+
+  // Cancellation instructions (Stage 8): zod-validated on write — a bad
+  // entry aborts the seed rather than storing junk instructions.
+  const cancelFile = join(__dirname, "seeds", "cancellations.json");
+  const cancelSeed = JSON.parse(readFileSync(cancelFile, "utf8")) as Array<{
+    merchant: string;
+    info: unknown;
+  }>;
+  let applied = 0;
+  for (const entry of cancelSeed) {
+    const info = cancellationInfoSchema.parse(entry.info); // throws on invalid
+    const updated = await db
+      .update(merchants)
+      .set({ cancellationInfo: info })
+      .where(eq(merchants.name, entry.merchant))
+      .returning({ id: merchants.id });
+    if (updated.length === 0) {
+      throw new Error(`cancellation entry for unknown merchant: ${entry.merchant}`);
+    }
+    applied++;
+  }
+  console.log(`[seed] cancellation info applied to ${applied} merchants`);
   await pg.end({ timeout: 5 });
 }
 

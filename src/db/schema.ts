@@ -263,3 +263,20 @@ export const alertPreferences = pgTable(
   },
   (table) => [unique("alert_preferences_user_type_uq").on(table.userId, table.type)],
 );
+
+/**
+ * Cancellation-assist demand telemetry (Stage 8): one row per assist open,
+ * merchant-level only. DELIBERATELY has no user reference of any kind — the
+ * weekly "most-requested merchants without data" query must never be able to
+ * identify a person (enforced by a schema test).
+ */
+export const assistOpens = pgTable(
+  "assist_opens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    merchant: text("merchant").notNull(),
+    hadData: boolean("had_data").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("assist_opens_merchant_idx").on(table.merchant, table.createdAt)],
+);

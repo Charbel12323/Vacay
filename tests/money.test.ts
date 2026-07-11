@@ -59,6 +59,26 @@ describe("summary math", () => {
     expect(summary.active_count).toBe(1);
   });
 
+  it("accrues cancelled subscriptions into total_saved, monthly-normalized", () => {
+    const summary = computeSummary([
+      { ...base, cadence: "monthly", currentAmount: "10.00" },
+      { ...base, status: "cancelled", cadence: "monthly", currentAmount: "18.99" },
+      { ...base, status: "cancelled", cadence: "annual", currentAmount: "120.00" }, // 10.00/mo
+      // Dismissed is "not a subscription", never savings.
+      { ...base, status: "dismissed", cadence: "monthly", currentAmount: "50.00" },
+      // A cancelled BILL is not subscription savings either.
+      {
+        ...base,
+        status: "cancelled",
+        classification: "bill",
+        cadence: "monthly",
+        currentAmount: "40.00",
+      },
+    ]);
+    expect(summary.total_saved).toBe("28.99");
+    expect(summary.monthly_recurring).toBe("10.00");
+  });
+
   it("counts flags and accrues likely-forgotten into waste", () => {
     const summary = computeSummary([
       { ...base, verdict: "price_increased", cadence: "monthly", currentAmount: "18.99" },
