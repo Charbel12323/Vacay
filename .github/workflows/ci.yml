@@ -66,6 +66,11 @@ jobs:
       - name: Apply migrations
         run: npm run db:migrate
 
+      # Reference data (merchants + cancellation instructions) is part of
+      # provisioning; the Stage 8 tests assert against it.
+      - name: Seed reference data
+        run: npm run db:seed
+
       - name: Test
         run: npm test
 
