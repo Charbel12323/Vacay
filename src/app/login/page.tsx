@@ -4,8 +4,9 @@ import { LoginForm } from "./login-form";
 
 export default function LoginPage() {
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", maxWidth: 360, margin: "4rem auto" }}>
-      <h1>Sign in</h1>
+    <main className="shell-narrow">
+      <div className="eyebrow">SubTracker</div>
+      <h1 style={{ margin: "0.4rem 0 1.25rem" }}>Sign in</h1>
       <LoginForm />
       {googleEnabled() && (
         <form
@@ -13,14 +14,14 @@ export default function LoginPage() {
             "use server";
             await signIn("google", { redirectTo: "/dashboard" });
           }}
-          style={{ marginTop: "1rem" }}
+          style={{ marginTop: "0.75rem" }}
         >
-          <button type="submit" style={{ width: "100%", padding: "0.5rem" }}>
+          <button type="submit" className="btn-quiet" style={{ width: "100%" }}>
             Continue with Google
           </button>
         </form>
       )}
-      <p style={{ marginTop: "1.5rem" }}>
+      <p className="muted" style={{ marginTop: "1.5rem" }}>
         No account? <Link href="/signup">Sign up</Link>
       </p>
     </main>

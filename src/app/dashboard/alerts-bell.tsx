@@ -63,58 +63,30 @@ export function AlertsBell() {
   }
 
   return (
-    <div ref={panelRef} style={{ position: "relative" }}>
+    <div ref={panelRef} className="bell-wrap">
       <button
         type="button"
         aria-label={`Alerts (${unread} unread)`}
         data-testid="alerts-bell"
+        className="bell-btn"
         onClick={() => setOpen((o) => !o)}
-        style={{ padding: "0.4rem 0.8rem", position: "relative" }}
       >
         🔔
         {unread > 0 && (
-          <span
-            data-testid="unread-badge"
-            style={{
-              position: "absolute",
-              top: -6,
-              right: -6,
-              background: "crimson",
-              color: "#fff",
-              borderRadius: 999,
-              fontSize: "0.7rem",
-              padding: "0.1rem 0.4rem",
-            }}
-          >
+          <span data-testid="unread-badge" className="bell-badge">
             {unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div
-          data-testid="alerts-panel"
-          style={{
-            position: "absolute",
-            right: 0,
-            top: "2.6rem",
-            width: "min(380px, 90vw)",
-            maxHeight: 420,
-            overflowY: "auto",
-            background: "#fff",
-            border: "1px solid #ddd",
-            borderRadius: 8,
-            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-            padding: "0.75rem",
-            zIndex: 40,
-          }}
-        >
-          <h3 style={{ margin: "0 0 0.5rem" }}>Alerts</h3>
-          {error && <p style={{ color: "crimson", fontSize: "0.85rem" }}>{error}</p>}
+        <div data-testid="alerts-panel" className="bell-panel">
+          <h3>Alerts</h3>
+          {error && <p className="error-text">{error}</p>}
           {items === null ? (
-            <p style={{ color: "#666" }}>Loading…</p>
+            <p className="muted">Loading…</p>
           ) : items.length === 0 ? (
-            <p style={{ color: "#666" }}>
+            <p className="muted">
               Nothing yet. When a price changes or a renewal approaches, it shows up here.
             </p>
           ) : (
@@ -125,30 +97,11 @@ export function AlertsBell() {
                     type="button"
                     data-testid="alert-item"
                     data-read={alert.read}
+                    className="alert-item"
                     onClick={() => void markRead(alert)}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      textAlign: "left",
-                      background: "none",
-                      border: "none",
-                      borderBottom: "1px solid #f0f0f0",
-                      padding: "0.5rem 0.25rem",
-                      cursor: alert.read ? "default" : "pointer",
-                      fontWeight: alert.read ? 400 : 600,
-                      color: "inherit",
-                      fontSize: "0.9rem",
-                    }}
                   >
                     {alertTitle(alert)}
-                    <span
-                      style={{
-                        display: "block",
-                        color: "#888",
-                        fontWeight: 400,
-                        fontSize: "0.75rem",
-                      }}
-                    >
+                    <span className="alert-date">
                       {new Date(alert.created_at).toLocaleDateString()}
                     </span>
                   </button>
@@ -159,8 +112,9 @@ export function AlertsBell() {
           {nextCursor && (
             <button
               type="button"
+              className="btn-ghost"
+              style={{ marginTop: "0.5rem" }}
               onClick={() => void load(nextCursor)}
-              style={{ marginTop: "0.5rem", padding: "0.3rem 0.7rem" }}
             >
               Load more
             </button>

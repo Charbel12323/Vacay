@@ -147,20 +147,20 @@ export function ConnectionsPanel() {
   }
 
   return (
-    <section style={{ marginTop: "2rem" }}>
+    <section style={{ marginTop: "2.4rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0 }}>Banks</h2>
+        <h2 style={{ margin: 0, fontSize: "1.25rem" }}>Banks</h2>
         <button
           type="button"
+          className="btn-primary"
           onClick={() => open()}
           disabled={!ready || busy}
-          style={{ padding: "0.5rem 1rem" }}
         >
           {busy ? "Connecting…" : "Connect a bank"}
         </button>
       </div>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
       {reauthState && (
         <ReauthLink
@@ -171,70 +171,57 @@ export function ConnectionsPanel() {
       )}
 
       {connections === null ? (
-        <p style={{ color: "#666" }}>Loading…</p>
+        <p className="muted">Loading…</p>
       ) : connections.length === 0 ? (
-        <p style={{ color: "#666" }}>
+        <p className="empty-note">
           No banks connected yet. Connect one to start finding your subscriptions.
         </p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {connections.map((c) => (
-            <li
-              key={c.id}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 8,
-                padding: "1rem",
-                marginTop: "0.75rem",
-              }}
-            >
-              <div
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-              >
+            <li key={c.id} className="bank-card">
+              <div className="bank-head">
                 <strong>{c.institution ?? "Bank"}</strong>
-                <span style={{ color: "#666", fontSize: "0.9rem" }}>
+                <span
+                  className={`bank-status${
+                    IN_PROGRESS.has(c.status)
+                      ? " is-busy"
+                      : c.status === "reauth_required" || c.status === "degraded"
+                        ? " is-problem"
+                        : ""
+                  }`}
+                >
                   {STATUS_LABELS[c.status] ?? c.status}
                 </span>
               </div>
 
               {c.status === "reauth_required" && (
-                <div
-                  style={{
-                    background: "#fff4e5",
-                    border: "1px solid #f0c36d",
-                    borderRadius: 6,
-                    padding: "0.6rem",
-                    marginTop: "0.5rem",
-                  }}
-                >
+                <div className="reauth-note">
                   This bank needs you to sign in again to keep syncing.{" "}
-                  <button type="button" onClick={() => void startReauth(c)}>
+                  <button type="button" className="btn-quiet" onClick={() => void startReauth(c)}>
                     Reconnect
                   </button>
                 </div>
               )}
 
-              <ul style={{ listStyle: "none", padding: 0, marginTop: "0.5rem", color: "#444" }}>
+              <ul className="bank-accounts">
                 {c.accounts.map((a) => (
                   <li key={a.id}>
-                    {a.name} {a.mask ? `••••${a.mask}` : ""} · {a.type} · {a.currency}
+                    {a.name} {a.mask ? <span className="mono">••••{a.mask}</span> : ""} · {a.type} ·{" "}
+                    {a.currency}
                   </li>
                 ))}
               </ul>
-              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.6rem" }}>
                 <button
                   type="button"
+                  className="btn-ghost"
                   onClick={() => void manualRefresh(c)}
                   disabled={IN_PROGRESS.has(c.status)}
-                  style={{ padding: "0.3rem 0.7rem" }}
                 >
                   Refresh
                 </button>
-                <button
-                  type="button"
-                  onClick={() => void disconnect(c)}
-                  style={{ padding: "0.3rem 0.7rem" }}
-                >
+                <button type="button" className="btn-danger" onClick={() => void disconnect(c)}>
                   Disconnect
                 </button>
               </div>

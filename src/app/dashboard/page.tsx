@@ -8,12 +8,15 @@ export default async function DashboardPage() {
   const session = await auth();
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", maxWidth: 720, margin: "3rem auto" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Dashboard</h1>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+    <main className="shell">
+      <header className="topbar">
+        <div>
+          <div className="eyebrow">SubTracker</div>
+          <h1>Dashboard</h1>
+        </div>
+        <div className="topbar-actions">
           <AlertsBell />
-          <Link href="/settings" style={{ padding: "0.4rem 0.4rem", fontSize: "0.9rem" }}>
+          <Link href="/settings" className="btn btn-ghost">
             Settings
           </Link>
           <form
@@ -22,13 +25,13 @@ export default async function DashboardPage() {
               await signOut({ redirectTo: "/" });
             }}
           >
-            <button type="submit" style={{ padding: "0.4rem 0.8rem" }}>
+            <button type="submit" className="btn-quiet">
               Sign out
             </button>
           </form>
         </div>
       </header>
-      <p>Signed in as {session?.user?.email}.</p>
+      <p className="signed-in">Signed in as {session?.user?.email}.</p>
       <SubscriptionsPanel />
       <ConnectionsPanel />
     </main>

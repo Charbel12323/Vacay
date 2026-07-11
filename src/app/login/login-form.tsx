@@ -31,7 +31,7 @@ function LoginFormInner() {
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ display: "grid", gap: "0.75rem" }}>
+    <form onSubmit={onSubmit} className="form-stack">
       <input
         type="email"
         required
@@ -39,7 +39,7 @@ function LoginFormInner() {
         autoComplete="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        style={{ padding: "0.5rem" }}
+        className="field"
       />
       <input
         type="password"
@@ -48,10 +48,10 @@ function LoginFormInner() {
         autoComplete="current-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        style={{ padding: "0.5rem" }}
+        className="field"
       />
-      {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-      <button type="submit" disabled={busy} style={{ padding: "0.5rem" }}>
+      {error && <p className="error-text">{error}</p>}
+      <button type="submit" disabled={busy} className="btn-primary">
         {busy ? "Signing in…" : "Sign in"}
       </button>
     </form>

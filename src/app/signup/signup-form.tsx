@@ -41,14 +41,14 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ display: "grid", gap: "0.75rem" }}>
+    <form onSubmit={onSubmit} className="form-stack">
       <input
         type="text"
         placeholder="Name (optional)"
         autoComplete="name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        style={{ padding: "0.5rem" }}
+        className="field"
       />
       <input
         type="email"
@@ -57,7 +57,7 @@ export function SignupForm() {
         autoComplete="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        style={{ padding: "0.5rem" }}
+        className="field"
       />
       <input
         type="password"
@@ -67,10 +67,10 @@ export function SignupForm() {
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        style={{ padding: "0.5rem" }}
+        className="field"
       />
-      {error && <p style={{ color: "crimson", margin: 0 }}>{error}</p>}
-      <button type="submit" disabled={busy} style={{ padding: "0.5rem" }}>
+      {error && <p className="error-text">{error}</p>}
+      <button type="submit" disabled={busy} className="btn-primary">
         {busy ? "Creating account…" : "Sign up"}
       </button>
     </form>
