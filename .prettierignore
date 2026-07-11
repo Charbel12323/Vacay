@@ -1,7 +1,8 @@
-# generated artifacts
-.next/
 node_modules/
+.next/
+drizzle/meta/
+package-lock.json
+coverage/
 test-results/
 playwright-report/
 results.sarif
-drizzle/meta/
