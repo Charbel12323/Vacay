@@ -37,23 +37,6 @@ type Detail = {
   }>;
 };
 
-const card: React.CSSProperties = {
-  border: "1px solid #ddd",
-  borderRadius: 8,
-  padding: "1rem",
-  flex: 1,
-};
-const row: React.CSSProperties = {
-  border: "1px solid #eee",
-  borderRadius: 8,
-  padding: "0.75rem 1rem",
-  marginTop: "0.5rem",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: "1rem",
-};
-
 function minutesAgo(iso: string | null): string {
   if (!iso) return "not synced yet";
   const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
@@ -131,7 +114,11 @@ export function SubscriptionsPanel() {
   }
 
   if (items === null || summary === null) {
-    return <p style={{ color: "#666", marginTop: "2rem" }}>Loading your subscriptions…</p>;
+    return (
+      <p className="muted" style={{ marginTop: "2rem" }}>
+        Loading your subscriptions…
+      </p>
+    );
   }
 
   const groups = groupByVerdict(items);
@@ -141,42 +128,52 @@ export function SubscriptionsPanel() {
   return (
     <section style={{ marginTop: "2rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h2 style={{ margin: 0 }}>Subscriptions</h2>
-        <span style={{ color: "#888", fontSize: "0.85rem" }}>{minutesAgo(summary.as_of)}</span>
+        <h2 style={{ margin: 0, fontSize: "1.25rem" }}>Subscriptions</h2>
+        <span className="mono faint" style={{ fontSize: "0.78rem" }}>
+          {minutesAgo(summary.as_of)}
+        </span>
       </div>
 
-      <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-        <div style={card}>
-          <div style={{ color: "#666", fontSize: "0.85rem" }}>Monthly recurring</div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 600 }}>
+      {/* The statement header. The monthly total wears the accountant's
+          double rule: this is the figure the page exists to defend. */}
+      <div className="statement">
+        <div className="statement-cell statement-total">
+          <div className="statement-label">Monthly recurring</div>
+          <div className="statement-figure">
             {formatMoney(summary.monthly_recurring, summary.currency)}
           </div>
-          <div style={{ color: "#888", fontSize: "0.8rem" }}>
+          <div className="statement-sub">
             {summary.active_count} active subscription{summary.active_count === 1 ? "" : "s"}
           </div>
           {summary.total_saved !== "0.00" && (
-            <div style={{ color: "#15803d", fontSize: "0.8rem" }} data-testid="total-saved">
+            <div className="statement-saved" data-testid="total-saved">
               Saved {formatMoney(summary.total_saved, summary.currency)}/mo by cancelling
             </div>
           )}
         </div>
-        <div style={card}>
-          <div style={{ color: "#666", fontSize: "0.85rem" }}>Price increases found</div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 600 }}>{summary.flags.price_increased}</div>
+        <div className="statement-cell">
+          <div className="statement-label">Price increases found</div>
+          <div
+            className={`statement-figure${summary.flags.price_increased > 0 ? " figure-flare" : ""}`}
+          >
+            {summary.flags.price_increased}
+          </div>
         </div>
-        <div style={card}>
-          <div style={{ color: "#666", fontSize: "0.85rem" }}>Likely forgotten</div>
-          <div style={{ fontSize: "1.6rem", fontWeight: 600 }}>
+        <div className="statement-cell">
+          <div className="statement-label">Likely forgotten</div>
+          <div
+            className={`statement-figure${summary.flags.likely_forgotten > 0 ? " figure-amber" : ""}`}
+          >
             {formatMoney(summary.estimated_monthly_waste, summary.currency)}
-            <span style={{ fontSize: "0.85rem", color: "#888" }}> /mo</span>
+            <span className="unit">/mo</span>
           </div>
         </div>
       </div>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
       {nothingDetected ? (
-        <p style={{ color: "#666", marginTop: "1.5rem" }}>
+        <p className="empty-note">
           No subscriptions found yet. Once your transactions are analyzed, anything recurring shows
           up here — if you just connected a bank, give it a minute.
         </p>
@@ -184,35 +181,48 @@ export function SubscriptionsPanel() {
         <>
           <Group
             title="Price increases"
+            rail="rail-flare"
             items={groups.price_increased}
             onOpen={setDetailId}
             onAssist={setAssistItem}
           />
           <Group
             title="Likely forgotten"
+            rail="rail-amber"
             items={groups.likely_forgotten}
             onOpen={setDetailId}
             onAssist={setAssistItem}
           />
 
           {groups.questions.length > 0 && (
-            <div style={{ marginTop: "1.5rem" }}>
-              <h3 style={{ marginBottom: 0 }}>Quick questions</h3>
+            <div className="ledger-section">
+              <div className="ledger-heading">
+                <h3>Quick questions</h3>
+                <span className="ledger-count">{groups.questions.length}</span>
+              </div>
               {groups.questions.map((item) => (
-                <div key={item.id} style={row} data-testid="question-card">
+                <div key={item.id} className="ledger-row rail-question" data-testid="question-card">
                   <div>
-                    <strong>{displayName(item)}</strong>
-                    <div style={{ color: "#666", fontSize: "0.9rem" }}>
-                      {verdictLine(item)} · {formatMoney(item.current_amount, item.currency)}
+                    <div className="ledger-merchant">{displayName(item)}</div>
+                    <div className="ledger-evidence">
+                      {verdictLine(item)} ·{" "}
+                      <span className="mono">
+                        {formatMoney(item.current_amount, item.currency)}
+                      </span>
                       {item.cadence ? ` ${cadenceLabel(item.cadence)}` : ""}
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: "0.5rem" }}>
-                    <button type="button" onClick={() => void confirmYes(item)}>
+                  <div className="ledger-actions">
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() => void confirmYes(item)}
+                    >
                       Yes
                     </button>
                     <button
                       type="button"
+                      className="btn-quiet"
                       onClick={() => void patch(item, { user_confirmed: false })}
                     >
                       No
@@ -225,6 +235,7 @@ export function SubscriptionsPanel() {
 
           <Group
             title="Healthy"
+            rail="rail-moss"
             items={groups.healthy}
             onOpen={setDetailId}
             onAssist={setAssistItem}
@@ -271,36 +282,44 @@ function cadenceLabel(cadence: string): string {
 
 function Group({
   title,
+  rail,
   items,
   onOpen,
   onAssist,
 }: {
   title: string;
+  rail: string;
   items: SubscriptionListItem[];
   onOpen: (id: string) => void;
   onAssist: (item: SubscriptionListItem) => void;
 }) {
   if (items.length === 0) return null;
   return (
-    <div style={{ marginTop: "1.5rem" }}>
-      <h3 style={{ marginBottom: 0 }}>{title}</h3>
+    <div className="ledger-section">
+      <div className="ledger-heading">
+        <h3>{title}</h3>
+        <span className="ledger-count">{items.length}</span>
+      </div>
       {items.map((item) => (
-        <div key={item.id} style={row} data-testid="verdict-row">
+        <div key={item.id} className={`ledger-row ${rail}`} data-testid="verdict-row">
           <div>
-            <strong>{displayName(item)}</strong>
-            <div style={{ color: "#666", fontSize: "0.9rem" }}>{verdictLine(item)}</div>
+            <div className="ledger-merchant">{displayName(item)}</div>
+            <div className="ledger-evidence">{verdictLine(item)}</div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <span style={{ fontWeight: 600 }}>
+          <div className="ledger-actions">
+            <span className="ledger-amount">
               {formatMoney(item.current_amount, item.currency)}
-              <span style={{ color: "#888", fontWeight: 400 }}>
-                {item.cadence ? cadenceLabel(item.cadence) : ""}
-              </span>
+              <span className="unit">{item.cadence ? cadenceLabel(item.cadence) : ""}</span>
             </span>
-            <button type="button" onClick={() => onOpen(item.id)}>
+            <button type="button" className="btn-ghost" onClick={() => onOpen(item.id)}>
               Details
             </button>
-            <button type="button" onClick={() => onAssist(item)} data-testid="assist-open">
+            <button
+              type="button"
+              className="btn-quiet"
+              onClick={() => onAssist(item)}
+              data-testid="assist-open"
+            >
               Cancel help
             </button>
           </div>
@@ -325,49 +344,46 @@ function DetailDrawer({
 }) {
   const s = detail.subscription;
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: "min(420px, 90vw)",
-        background: "#fff",
-        borderLeft: "1px solid #ddd",
-        boxShadow: "-4px 0 16px rgba(0,0,0,0.08)",
-        padding: "1.25rem",
-        overflowY: "auto",
-        zIndex: 50,
-      }}
-      data-testid="detail-drawer"
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h3 style={{ margin: 0 }}>{s.merchant_name ?? displayName(s)}</h3>
-        <button type="button" onClick={onClose}>
+    <div className="drawer" data-testid="detail-drawer">
+      <div className="drawer-head">
+        <h3>{s.merchant_name ?? displayName(s)}</h3>
+        <button type="button" className="btn-ghost" onClick={onClose}>
           Close
         </button>
       </div>
-      <p style={{ color: "#666" }}>{verdictLine(s, detail.price_history[0] ?? null)}</p>
+      <p className="muted" style={{ marginTop: "0.35rem" }}>
+        {verdictLine(s, detail.price_history[0] ?? null)}
+      </p>
       <p>
-        {formatMoney(s.current_amount, s.currency)}
-        {s.cadence ? ` ${cadenceLabel(s.cadence)}` : ""} · confidence {s.confidence}
+        <span className="mono">
+          {formatMoney(s.current_amount, s.currency)}
+          {s.cadence ? cadenceLabel(s.cadence) : ""}
+        </span>{" "}
+        · confidence <span className="mono">{s.confidence}</span>
         {s.account && (
-          <span style={{ color: "#888" }}>
+          <span className="faint">
             {" "}
-            · {s.account.name} {s.account.mask ? `••••${s.account.mask}` : ""}
+            · {s.account.name}{" "}
+            {s.account.mask ? <span className="mono">••••{s.account.mask}</span> : ""}
           </span>
         )}
       </p>
-      {s.next_expected_date && <p>Next expected charge: {s.next_expected_date}</p>}
+      {s.next_expected_date && (
+        <p>
+          Next expected charge: <span className="mono">{s.next_expected_date}</span>
+        </p>
+      )}
 
       {detail.price_history.length > 0 && (
         <>
           <h4>Price history</h4>
-          <ul style={{ paddingLeft: "1rem" }}>
+          <ul className="evidence-list">
             {detail.price_history.map((p, i) => (
               <li key={i}>
-                {formatMoney(p.old_amount, s.currency)} → {formatMoney(p.new_amount, s.currency)} on{" "}
-                {p.effective_date}
+                <span className="mono">
+                  {formatMoney(p.old_amount, s.currency)} → {formatMoney(p.new_amount, s.currency)}
+                </span>
+                <span className="mono faint">{p.effective_date}</span>
               </li>
             ))}
           </ul>
@@ -375,34 +391,30 @@ function DetailDrawer({
       )}
 
       <h4>Charges we found</h4>
-      <ul style={{ listStyle: "none", padding: 0 }}>
+      <ul className="evidence-list">
         {detail.evidence.map((t) => (
-          <li
-            key={t.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              borderBottom: "1px solid #f0f0f0",
-              padding: "0.35rem 0",
-              fontSize: "0.9rem",
-            }}
-          >
-            <span style={{ color: "#555" }}>
-              {t.date} · <code>{t.raw_descriptor}</code>
+          <li key={t.id}>
+            <span>
+              <span className="mono faint">{t.date}</span> · <code>{t.raw_descriptor}</code>
             </span>
-            <span>{formatMoney(t.amount, t.currency)}</span>
+            <span className="money">{formatMoney(t.amount, t.currency)}</span>
           </li>
         ))}
       </ul>
 
-      <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-        <button type="button" onClick={onAssist} data-testid="drawer-assist">
+      <div style={{ display: "flex", gap: "0.5rem", marginTop: "1.25rem", flexWrap: "wrap" }}>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={onAssist}
+          data-testid="drawer-assist"
+        >
           How to cancel
         </button>
-        <button type="button" onClick={onNotSubscription}>
+        <button type="button" className="btn-quiet" onClick={onNotSubscription}>
           Not a subscription
         </button>
-        <button type="button" onClick={onDismiss}>
+        <button type="button" className="btn-ghost" onClick={onDismiss}>
           Dismiss
         </button>
       </div>
