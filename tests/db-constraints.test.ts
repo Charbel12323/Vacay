@@ -45,7 +45,12 @@ describe.skipIf(!hasDb)("database constraints", () => {
     };
 
     await db.insert(transactions).values(row);
-    await expect(db.insert(transactions).values(row)).rejects.toThrow(/duplicate key|unique/i);
+    // drizzle-orm ≥0.45 wraps DB errors in DrizzleQueryError with the
+    // Postgres unique-violation as `cause` — assert on the whole chain.
+    await expect(db.insert(transactions).values(row)).rejects.toSatisfy((err: unknown) => {
+      const chain = `${(err as Error).message} ${((err as Error).cause as Error | undefined)?.message ?? ""}`;
+      return /duplicate key|unique/i.test(chain);
+    });
 
     // Cascade from this user purges its connection, account, and transactions.
     const { eq } = await import("drizzle-orm");

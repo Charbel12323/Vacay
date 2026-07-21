@@ -14,6 +14,8 @@ const envSchema = z.object({
   EMAIL_FROM: z.string().default("SubTracker <alerts@subtracker.app>"),
   // Base URL for links inside emails (dashboard, preferences).
   APP_BASE_URL: z.string().url().default("http://127.0.0.1:3000"),
+  // Beta gate (Stage 9 task 13): when set, signup requires this invite code.
+  BETA_INVITE_CODE: z.string().min(4).optional(),
   AUTH_SECRET: z.string().min(1),
   // Optional: Google sign-in is offered only when both are set.
   GOOGLE_CLIENT_ID: z.string().optional(),

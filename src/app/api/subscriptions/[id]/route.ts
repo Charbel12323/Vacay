@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db/client";
+import { invalidateUserDashboards } from "@/lib/cache";
 import { accounts, merchants, priceChanges, subscriptions, transactions } from "@/db/schema";
 import { enqueueDetection } from "@/lib/queues";
 import { ApiError, withErrorHandling } from "@/modules/api/errors";
@@ -157,6 +158,10 @@ export const PATCH = withErrorHandling(async (req: NextRequest, context: Context
         .where(eq(subscriptions.id, row.id));
     }
   });
+
+  // Invariant 8, read-your-own-writes: the cached dashboard views die
+  // BEFORE this response is sent, so the very next read rebuilds fresh.
+  await invalidateUserDashboards(user.id);
 
   // Truth before announce: enqueue only after the commit above.
   if (enqueueIncremental) {

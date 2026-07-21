@@ -6,7 +6,7 @@ import { errorBody } from "@/modules/api/errors";
 // Edge-safe NextAuth instance: decodes the session JWT, no DB access.
 const { auth } = NextAuth(authConfig);
 
-const PUBLIC_PAGES = new Set(["/", "/login", "/signup"]);
+const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/privacy"]);
 
 // /api/health and /api/webhooks/* are machine-facing; /api/auth/* is the auth
 // flow itself (it carries its own rate limiting instead).

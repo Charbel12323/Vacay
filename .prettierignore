@@ -3,3 +3,6 @@ node_modules/
 drizzle/meta/
 package-lock.json
 coverage/
+test-results/
+playwright-report/
+results.sarif

@@ -1,5 +1,31 @@
 # Progress log
 
+## Stage 9 — Hardening & launch (2026-07-11)
+
+**Built:**
+Redis cache-aside on the summary and subscription-list endpoints (`dash:{userId}:*`, TTL 10min ± 2min jitter, SCAN-based per-user invalidation, no global flush anywhere); the detection orchestrator and every subscription PATCH delete the user's keys, PATCH before its response (invariant 8); the cache swallows Redis failures and falls back to Postgres.
+Account deletion (FR15): `DELETE /api/users/me` marks `deleted_pending` and enqueues an idempotent, resumable purge on a new `maintenance` queue — Plaid `/item/remove` per connection (already-gone Items count as done), then the user row (everything else cascades); settings page gained a type-DELETE-to-confirm danger zone.
+Reliability nets: the daily sweep now also re-enqueues connections stuck in `syncing` >30 min and finishes orphaned `revoking` purges; `npm run queues:failed` lists/retries dead-letter jobs; worker shutdown drains in-flight jobs before exiting.
+Security: CSP (Plaid-only external surface) + HSTS + nosniff + referrer/permissions policies; structured pino logger with credential/PII redaction replacing worker console logging, with duration metrics and queue-depth heartbeat; strict per-IP limit on link-token creation and a general 120/min per-user limit at the requireUser choke point; `npm audit` (high+) and gitleaks secrets scan added to CI.
+Privacy (PIPEDA): public `/privacy` page in plain language; consent copy with the privacy link on the connect screen; deletion within 30 days documented and actually immediate.
+Beta gate: optional `BETA_INVITE_CODE` env — when set, signup requires the invite code; signup form carries the field.
+`RUNBOOK.md`: webhook outage, Plaid outage, queue backlog, cache/Redis recovery, TOKEN_ENC_KEY rotation procedure, Neon restore drill procedure with a timing table, the full production-infrastructure operator checklist, and environment promotion rules.
+
+**NFR numbers (benchmark-scale.ts, local, 50k-transaction heavy user):**
+Detection load+engine+diff over 50,000 transactions: 874 ms (NFR <30 s — pass, 34× headroom).
+Dashboard p95 with cache: summary 8.3 ms, list 7.9 ms (NFR <500 ms — pass); uncached stage 6 numbers were 10.5/9.0 ms.
+Cache hit ratio under the read loop: 98% (NFR >80% — pass).
+Deleting an account leaves zero rows across all eight tables and removes every Item at Plaid (integration test, including a mid-purge crash resume).
+Worker kill-under-load safety re-verified by the standing sync crash test (cursor atomicity) plus the new stuck-sync re-enqueue sweep.
+
+**Fixed along the way:**
+Upgraded drizzle-orm 0.38 → 0.45 to clear a high-severity SQL-injection advisory (GHSA-gpj5-g38j-94v9); its new wrapped `DrizzleQueryError` required one test adjustment.
+The queue-dedup test now pauses the sync queue while counting, ending the recurring flake when a dev worker shares Redis.
+
+**Deviations / operator items (need Charbel's accounts, documented in RUNBOOK.md):**
+Vercel/Railway/Neon/Upstash provisioning, the Neon restore drill execution, Resend domain verification, Sentry wiring (logger is structured and redacting; error tracking needs a DSN), and submitting the Plaid production application.
+The remaining `npm audit` findings are two moderates inside Next's bundled postcss; the CI gate is set at high, and the Next upgrade train owns that fix.
+
 ## Stage 8 — Cancellation assist (2026-07-09)
 
 **Built:**

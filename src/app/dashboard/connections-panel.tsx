@@ -160,6 +160,12 @@ export function ConnectionsPanel() {
         </button>
       </div>
 
+      <p className="faint" style={{ fontSize: "0.8rem", margin: "0.4rem 0 0" }}>
+        Connecting shares read-only transaction history with SubTracker via Plaid — we never see
+        your bank password and never move money. Details and deletion rights:{" "}
+        <a href="/privacy">privacy</a>.
+      </p>
+
       {error && <p className="error-text">{error}</p>}
 
       {reauthState && (

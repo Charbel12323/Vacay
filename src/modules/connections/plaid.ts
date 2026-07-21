@@ -169,3 +169,9 @@ export async function getInstitutionName(institutionId: string): Promise<string 
 export async function removeItem(accessToken: string): Promise<void> {
   await plaid().itemRemove({ access_token: accessToken });
 }
+
+/** True when the Item is already gone at Plaid — removal is then a success. */
+export function isItemGone(err: unknown): boolean {
+  const data = (err as { response?: { data?: { error_code?: string } } })?.response?.data;
+  return data?.error_code === "ITEM_NOT_FOUND" || data?.error_code === "INVALID_ACCESS_TOKEN";
+}

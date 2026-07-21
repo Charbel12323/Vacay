@@ -9,6 +9,7 @@ export function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -20,7 +21,12 @@ export function SignupForm() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, name: name || undefined }),
+      body: JSON.stringify({
+        email,
+        password,
+        name: name || undefined,
+        invite_code: inviteCode || undefined,
+      }),
     });
 
     if (!res.ok) {
@@ -67,6 +73,14 @@ export function SignupForm() {
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        className="field"
+      />
+      <input
+        type="text"
+        placeholder="Invite code (during beta)"
+        autoComplete="off"
+        value={inviteCode}
+        onChange={(e) => setInviteCode(e.target.value)}
         className="field"
       />
       {error && <p className="error-text">{error}</p>}

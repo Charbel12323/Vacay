@@ -45,6 +45,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # gitleaks scans history
+
+      # Secrets scan (Stage 9 task 8): fail fast if a credential ever lands
+      # in the tree or its history.
+      - name: Secrets scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -53,6 +62,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # Production dependencies must be free of high/critical advisories.
+      - name: Dependency audit
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Typecheck
         run: npm run typecheck
